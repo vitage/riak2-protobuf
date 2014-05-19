@@ -12,7 +12,7 @@ function bodyless (code, type) {
     this.subject.write({
       code: code,
       size: 0,
-      data: new Buffer(0)
+      data: null
     });
   });
 }
