@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/mikepb/ripe-protobuf.svg)](https://travis-ci.org/mikepb/ripe-protobuf)
+
 # Ripe Socket
 
 A Riak Protocol Buffer socket for Node.JS.
