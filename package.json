@@ -1,6 +1,6 @@
 {
   "name": "ripe-protobuf",
-  "version": "0.0.2-dev",
+  "version": "0.0.2",
   "description": "Riak Protocol Buffer socket for Node.JS",
   "main": "lib/index.js",
   "repository": "https://github.com/mikepb/ripe-protobuf.git",
