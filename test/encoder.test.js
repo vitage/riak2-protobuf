@@ -544,7 +544,7 @@ describe('Protocol Buffer Encoder', function () {
   bodyless(22, 'RpbSetBucketResp');
 
   it('should encode RpbMapRedReq', function (done) {
-    var request = JSON.stringify({
+    var request = {
       inputs: 'training',
       query: [
         {
@@ -557,17 +557,15 @@ describe('Protocol Buffer Encoder', function () {
           }
         }
       ]
-    }, function (key, value) {
-      if (typeof value == 'function') {
-        return value.toString();
-      }
-      return value;
+    };
+    var reqstr = JSON.stringify(request, function (key, value) {
+      return typeof value == 'function' ? value.toString() : value;
     });
     this.subject.on('data', function (buf) {
       assert.equal(buf.readUInt32BE(0), buf.length - 4);
       assert.equal(buf[4], 23);
       var data = schema.RpbMapRedReq.decode(buf.slice(5));
-      assert.deepEqual(data.request.toString('utf8'), request);
+      assert.deepEqual(data.request.toString('utf8'), reqstr);
       assert.equal(data.content_type.toString('utf8'), 'application/json');
       done();
     });
