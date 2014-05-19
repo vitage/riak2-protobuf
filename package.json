@@ -1,0 +1,19 @@
+{
+  "name": "ripe-protobuf",
+  "version": "0.0.1",
+  "description": "Riak Protocol Buffer socket for Node.JS",
+  "main": "lib/index.js",
+  "repository": "https://github.com/mikepb/ripe-protobuf.git",
+  "scripts": {
+    "test": "mocha --reporter spec"
+  },
+  "author": "Michael Phan-Ba <michael@mikepb.com>",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "protobufjs": "^2.0.5"
+  },
+  "devDependencies": {
+    "mocha": "^1.19.0"
+  }
+}
