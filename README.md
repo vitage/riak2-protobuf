@@ -9,12 +9,12 @@ var RipeSocket = require('ripe-protobuf');
 var socket = new Ripe();
 
 socket.write({
-  code: 'RpbGetServerInfoReq'
+  type: 'RpbGetServerInfoReq'
 });
 
 socket.once('data', function (data) {
   console.log(data);
-  // { code: 'RpbGetServerInfoResp',
+  // { type: 'RpbGetServerInfoResp',
   //   result: {
   //     node: 'riak@127.0.0.1',
   //     server_version: '2.0.0beta1' } }
