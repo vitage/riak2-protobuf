@@ -18,7 +18,7 @@ function bodyless (code, type) {
 }
 
 function testContent (content) {
-  assert.deepEqual(content.value, {});
+  assert.deepEqual(content.value, { hello: 'world' });
   assert.equal(content.content_type, 'application/json');
   assert.equal(content.charset, 'utf8');
   assert.equal(content.content_encoding, '');
@@ -51,7 +51,7 @@ function testContent (content) {
 }
 
 testContent.data = {
-  value: new Buffer('{}'),
+  value: '{"hello":"world"}',
   content_type: 'application/json',
   charset: 'utf8',
   content_encoding: '',

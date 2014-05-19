@@ -17,7 +17,7 @@ function bodyless (code, type) {
 }
 
 function testContent (content) {
-  assert.equal(content.value.toString('utf8'), '{}');
+  assert.equal(content.value.toString('utf8'), '{"hello":"world"}');
   assert.equal(content.content_type.toString('utf8'), 'application/json');
   assert.equal(content.charset.toString('utf8'), 'utf8');
   assert.equal(content.content_encoding.toString('utf8'), '');
@@ -40,7 +40,7 @@ function testContent (content) {
 }
 
 testContent.data = {
-  value: new Buffer('{}'),
+  value: { hello: 'world' },
   content_type: 'application/json',
   charset: 'utf8',
   content_encoding: '',
