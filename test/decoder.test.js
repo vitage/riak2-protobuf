@@ -286,6 +286,83 @@ describe('Protocol Buffer Decoder', function () {
     });
   });
 
+  it('should decode RpbGetResp with text/*', function (done) {
+    var content = {
+      value: 'this is text data',
+      content_type: 'text/plain'
+    };
+    this.subject.on('data', function (data) {
+      assert.equal(data.result.content[0].value, content.value);
+      done();
+    });
+    var buf = new schema.RpbGetResp({
+      content: [content]
+    }).toBuffer();
+    this.subject.write({
+      code: 10,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode RpbGetResp with application/xml', function (done) {
+    var content = {
+      value: '<?xml version="1.0"?><p>this is text data</p>',
+      content_type: 'application/xml'
+    };
+    this.subject.on('data', function (data) {
+      assert.equal(data.result.content[0].value, content.value);
+      done();
+    });
+    var buf = new schema.RpbGetResp({
+      content: [content]
+    }).toBuffer();
+    this.subject.write({
+      code: 10,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode RpbGetResp with application/html', function (done) {
+    var content = {
+      value: 'this is text data</p>',
+      content_type: 'application/html'
+    };
+    this.subject.on('data', function (data) {
+      assert.equal(data.result.content[0].value, content.value);
+      done();
+    });
+    var buf = new schema.RpbGetResp({
+      content: [content]
+    }).toBuffer();
+    this.subject.write({
+      code: 10,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode RpbGetResp with application/octet-stream', function (done) {
+    var content = {
+      value: new Buffer([1, 2, 3, 4, 5]),
+      content_type: 'application/octet-stream'
+    };
+    this.subject.on('data', function (data) {
+      assert.deepEqual([].slice.call(data.result.content[0].value),
+        [].slice.call(content.value));
+      done();
+    });
+    var buf = new schema.RpbGetResp({
+      content: [content]
+    }).toBuffer();
+    this.subject.write({
+      code: 10,
+      size: buf.length,
+      data: buf
+    });
+  });
+
   it('should decode RpbPutReq', function (done) {
     this.subject.on('data', function (data) {
       assert.equal(data.type, 'RpbPutReq');
