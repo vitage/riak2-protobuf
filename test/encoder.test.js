@@ -601,6 +601,78 @@ describe('Protocol Buffer Encoder', function () {
     });
   });
 
+  it('should encode RpbIndexReq', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 25);
+      var data = schema.RpbIndexReq.decode(buf.slice(5));
+      assert.equal(data.bucket.toString('utf8'), 'test bucket');
+      assert.equal(data.index.toString('utf8'), 'test index');
+      assert.equal(data.qtype, 1);
+      assert.equal(data.key.toString('utf8'), 'test key');
+      assert.equal(data.range_min.toString('utf8'), 'test min');
+      assert.equal(data.range_max.toString('utf8'), 'test max');
+      assert.equal(data.return_terms, false);
+      assert.equal(data.stream, true);
+      assert.equal(data.max_results, 10);
+      assert.equal(data.continuation.toString('utf8'), 'test buffer');
+      assert.equal(data.timeout, 10000);
+      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.equal(data.term_regex.toString('utf8'), '.*');
+      assert.equal(data.pagination_sort, false);
+      done();
+    });
+    this.subject.write({
+      type: 'RpbIndexReq',
+      data: {
+        bucket: 'test bucket',
+        index: 'test index',
+        qtype: 'range',
+        key: 'test key',
+        range_min: 'test min',
+        range_max: 'test max',
+        return_terms: false,
+        stream: true,
+        max_results: 10,
+        continuation: new Buffer('test buffer'),
+        timeout: 10000,
+        type: 'test type',
+        term_regex: /.*/,
+        pagination_sort: false
+      }
+    });
+  });
+
+  it('should encode RpbIndexResp', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 26);
+      var data = schema.RpbIndexResp.decode(buf.slice(5));
+      assert.equal(data.keys.length, 1);
+      assert.equal(data.keys[0].toString('utf8'), 'test key');
+      assert.equal(data.results.length, 1);
+      assert.equal(data.results[0].key.toString('utf8'), 'test key');
+      assert.equal(data.results[0].value.toString('utf8'), 'test value');
+      assert.equal(data.continuation.toString('utf8'), 'test buffer');
+      assert.equal(data.done, false);
+      done();
+    });
+    this.subject.write({
+      type: 'RpbIndexResp',
+      data: {
+        keys: ['test key'],
+        results: [
+          {
+            key: 'test key',
+            value: new Buffer('test value')
+          }
+        ],
+        continuation: new Buffer('test buffer'),
+        done: false
+      }
+    });
+  });
+
 // 25,RpbIndexReq,riak_kv
 // 26,RpbIndexResp,riak_kv
 // 27,RpbSearchQueryReq,riak_search

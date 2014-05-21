@@ -57,8 +57,6 @@ These message types have not yet been tested and the socket will
 return data from Riak as-is:
 
 ```csv
-25,RpbIndexReq,riak_kv
-26,RpbIndexResp,riak_kv
 27,RpbSearchQueryReq,riak_search
 28,RpbSearchQueryResp,riak_search
 29,RpbResetBucketReq,riak

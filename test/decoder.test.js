@@ -670,8 +670,80 @@ describe('Protocol Buffer Decoder', function () {
     });
   });
 
-// 25,RpbIndexReq,riak_kv
-// 26,RpbIndexResp,riak_kv
+  it('should decode RpbIndexReq', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data.type, 'RpbIndexReq');
+      assert.equal(data.result.bucket, 'test bucket');
+      assert.equal(data.result.index, 'test index');
+      assert.equal(data.result.qtype, 'range');
+      assert.equal(data.result.key, 'test key');
+      assert.equal(data.result.range_min, 'test min');
+      assert.equal(data.result.range_max, 'test max');
+      assert.equal(data.result.return_terms, false);
+      assert.equal(data.result.stream, true);
+      assert.equal(data.result.max_results, 10);
+      assert(Buffer.isBuffer(data.result.continuation));
+      assert.equal(data.result.continuation.toString('utf8'), 'test buffer');
+      assert.equal(data.result.timeout, 10000);
+      assert.equal(data.result.type, 'test type');
+      assert(data.result.term_regex instanceof RegExp);
+      assert.equal(data.result.term_regex.source, '.*');
+      assert.equal(data.result.pagination_sort, false);
+      done();
+    });
+    var buf = new schema.RpbIndexReq({
+      bucket: 'test bucket',
+      index: 'test index',
+      qtype: 'range',
+      key: 'test key',
+      range_min: 'test min',
+      range_max: 'test max',
+      return_terms: false,
+      stream: true,
+      max_results: 10,
+      continuation: new Buffer('test buffer'),
+      timeout: 10000,
+      type: 'test type',
+      term_regex: '.*',
+      pagination_sort: false
+    }).toBuffer();
+    this.subject.write({
+      code: 25,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode RpbIndexResp', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data.type, 'RpbIndexResp');
+      assert.deepEqual(data.result.keys, ['test key']);
+      assert.equal(data.result.results.length, 1);
+      assert.equal(data.result.results[0].key, 'test key');
+      assert.equal(data.result.results[0].value, 'test value');
+      assert(Buffer.isBuffer(data.result.continuation));
+      assert.equal(data.result.continuation.toString('utf8'), 'test buffer');
+      assert.equal(data.result.done, false);
+      done();
+    });
+    var buf = new schema.RpbIndexResp({
+      keys: ['test key'],
+      results: [
+        {
+          key: 'test key',
+          value: new Buffer('test value')
+        }
+      ],
+      continuation: new Buffer('test buffer'),
+      done: false
+    }).toBuffer();
+    this.subject.write({
+      code: 26,
+      size: buf.length,
+      data: buf
+    });
+  });
+
 // 27,RpbSearchQueryReq,riak_search
 // 28,RpbSearchQueryResp,riak_search
 // 29,RpbResetBucketReq,riak
