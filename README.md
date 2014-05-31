@@ -1,12 +1,12 @@
-[![Build Status](https://travis-ci.org/mikepb/ripe-protobuf.svg)](https://travis-ci.org/mikepb/ripe-protobuf)
+# Riak Stream
 
-# Ripe Socket
+[![Build Status](https://travis-ci.org/mikepb/riakjs2-protobuf.svg)](https://travis-ci.org/mikepb/riakjs2-protobuf)
 
-A Riak Protocol Buffer socket for Node.JS.
+A Riak Protocol Buffer stream for Node.JS.
 
 ```js
-var RipeSocket = require('ripe-protobuf');
-var socket = new Ripe();
+var RiakSocket = require('riakjs2-protobuf');
+var socket = new RiakSocket();
 
 socket.write({
   type: 'RpbGetServerInfoReq'
@@ -26,7 +26,7 @@ socket.once('data', function (data) {
 ## Install
 
 ```bash
-npm install ripe-protobuf
+npm install riakjs2-protobuf
 ```
 
 
