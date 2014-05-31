@@ -6,6 +6,7 @@
   * Pass-through events from underlying streams
   * Support decoding string MIME types
   * Handle encoding and decoding `RpbIndexReq` and `RpbIndexResp`
+  * Fix parsing error on empty content
 
 
 0.0.2 / 2014-05-19

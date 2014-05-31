@@ -428,6 +428,26 @@ describe('Protocol Buffer Parser', function () {
     });
   });
 
+  it('should decode RpbPutResp with no content', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'RpbPutResp');
+      assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
+      assert.equal(data.key, 'test key');
+      assert.equal(data.content.length, 0);
+      done();
+    });
+    var buf = new schema.RpbPutResp({
+      content: [],
+      vclock: new Buffer([13, 19]),
+      key: 'test key'
+    }).toBuffer();
+    this.subject.write({
+      code: 12,
+      size: buf.length,
+      data: buf
+    });
+  });
+
   it('should decode RpbDelReq', function (done) {
     this.subject.on('data', function (data) {
       assert.equal(data._type, 'RpbDelReq');
