@@ -28,23 +28,31 @@ npm install riakjs2-protobuf
 
 ## Writing to the socket
 
-The socket accepts an object with two keys:
+The socket accepts a data object and a message type:
 
-- `type` for the string representation of the
-  [Riak message type][riak-pb].
-- `data` for the Protocol Buffer data.
+```js
+// send ping request
+socket.write('RpbPingReq');
+
+// send get request
+socket.write({
+  bucket: 'mybucket',
+  key: 'mykey'
+}, 'RpbGetReq');
+```
 
 
 ## Reading from the socket
 
-The socket emits the standard stream events, so you can do
-`socket.on('data', ondata)`. The callback will be passed a single
-`data` argument with three possible keys:
+The socket emits response data:
 
-- `type` for the string representation of the
-  [Riak message type][riak-pb].
-- `result` for the Protocol Buffer response.
-- `error` for an error.
+```js
+// process response
+socket.once('data', function (data) {
+  console.log(data._code, data._type);
+  console.log(data);
+});
+```
 
 
 ## Implementation notes
