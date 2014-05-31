@@ -1,18 +1,24 @@
 var assert = require('assert');
 
-var Encoder = require('../lib/index').Encoder;
+var Serializer = require('../lib/index').Serializer;
 var schema = require('../lib/index').schema;
 
 function bodyless (code, type) {
   it('should encode ' + type, function (done) {
-    this.subject.on('data', function (buf) {
+    var subject = this.subject;
+
+    subject.once('data', function (buf) {
       assert.equal(buf.readUInt32BE(0), 1);
       assert.equal(buf[4], code);
-      done();
+      subject.on('data', function (buf) {
+        assert.equal(buf.readUInt32BE(0), 1);
+        assert.equal(buf[4], code);
+        done();
+      });
     });
-    this.subject.write({
-      type: type
-    });
+
+    this.subject.write({}, type);
+    this.subject.write(type);
   });
 }
 
@@ -135,10 +141,10 @@ testBucketProps.data = {
   search_index: 'default'
 };
 
-describe('Protocol Buffer Encoder', function () {
+describe('Protocol Buffer Serializer', function () {
 
   beforeEach(function () {
-    this.subject = new Encoder();
+    this.subject = new Serializer();
   });
 
   it('should encode RpbErrorResp with Error', function (done) {
@@ -152,10 +158,7 @@ describe('Protocol Buffer Encoder', function () {
     });
     var err = new Error('test message');
     err.code = 1234;
-    this.subject.write({
-      type: 'RpbErrorResp',
-      error: err
-    });
+    this.subject.write(err, 'RpbErrorResp');
   });
 
   it('should encode RpbErrorResp with data', function (done) {
@@ -168,12 +171,9 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbErrorResp',
-      data: {
-        errmsg: 'test message',
-        errcode: 1234
-      }
-    });
+      errmsg: 'test message',
+      errcode: 1234
+    }, 'RpbErrorResp');
   });
 
   bodyless(1, 'RpbPingReq');
@@ -189,11 +189,8 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbGetClientIdResp',
-      data: {
-        client_id: 'test client id'
-      }
-    });
+      client_id: 'test client id'
+    }, 'RpbGetClientIdResp');
   });
 
   it('should encode RpbSetClientIdReq', function (done) {
@@ -205,11 +202,8 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbSetClientIdReq',
-      data: {
-        client_id: 'test client id'
-      }
-    });
+      client_id: 'test client id'
+    }, 'RpbSetClientIdReq');
   });
 
   bodyless(6, 'RpbSetClientIdResp');
@@ -225,12 +219,9 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbGetServerInfoResp',
-      data: {
-        node: 'test node',
-        server_version: '2.0.0'
-      }
-    });
+      node: 'test node',
+      server_version: '2.0.0'
+    }, 'RpbGetServerInfoResp');
   });
 
   it('should encode RpbGetReq', function (done) {
@@ -252,23 +243,20 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbGetReq',
-      data: {
-        bucket: 'test bucket',
-        key: 'test key',
-        r: 3,
-        pr: 1,
-        basic_quorum: false,
-        notfound_ok: true,
-        if_modified: new Buffer([13, 19]),
-        head: false,
-        deletedvclock: false,
-        timeout: 12345,
-        sloppy_quorum: false,
-        n_val: 1,
-        type: 'default'
-      }
-    });
+      bucket: 'test bucket',
+      key: 'test key',
+      r: 3,
+      pr: 1,
+      basic_quorum: false,
+      notfound_ok: true,
+      if_modified: new Buffer([13, 19]),
+      head: false,
+      deletedvclock: false,
+      timeout: 12345,
+      sloppy_quorum: false,
+      n_val: 1,
+      type: 'default'
+    }, 'RpbGetReq');
   });
 
   it('should encode RpbGetResp', function (done) {
@@ -283,13 +271,10 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbGetResp',
-      data: {
-        content: [testContent.data],
-        vclock: new Buffer([13, 19]),
-        unchanged: false
-      }
-    });
+      content: [testContent.data],
+      vclock: new Buffer([13, 19]),
+      unchanged: false
+    }, 'RpbGetResp');
   });
 
   it('should encode RpbPutReq', function (done) {
@@ -316,26 +301,23 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbPutReq',
-      data: {
-        bucket: 'test bucket',
-        key: 'test key',
-        vclock: new Buffer([13, 19]),
-        content: testContent.data,
-        w: 3,
-        dw: 2,
-        return_body: true,
-        pw: 1,
-        if_not_modified: true,
-        if_none_match: false,
-        return_head: false,
-        timeout: 77272,
-        asis: false,
-        sloppy_quorum: false,
-        n_val: 3,
-        type: 'test type'
-      }
-    });
+      bucket: 'test bucket',
+      key: 'test key',
+      vclock: new Buffer([13, 19]),
+      content: testContent.data,
+      w: 3,
+      dw: 2,
+      return_body: true,
+      pw: 1,
+      if_not_modified: true,
+      if_none_match: false,
+      return_head: false,
+      timeout: 77272,
+      asis: false,
+      sloppy_quorum: false,
+      n_val: 3,
+      type: 'test type'
+    }, 'RpbPutReq');
   });
 
   it('should encode RpbPutResp', function (done) {
@@ -350,13 +332,10 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbPutResp',
-      data: {
-        content: [testContent.data],
-        vclock: new Buffer([13, 19]),
-        key: 'test key'
-      }
-    });
+      content: [testContent.data],
+      vclock: new Buffer([13, 19]),
+      key: 'test key'
+    }, 'RpbPutResp');
   });
 
   it('should encode RpbDelReq', function (done) {
@@ -380,23 +359,20 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbDelReq',
-      data: {
-        bucket: 'test bucket',
-        key: 'test key',
-        rw: 3,
-        vclock: new Buffer([13, 19]),
-        r: 2,
-        w: 1,
-        pr: 7,
-        pw: 8,
-        dw: 9,
-        timeout: 77272,
-        sloppy_quorum: false,
-        n_val: 3,
-        type: 'test type'
-      }
-    });
+      bucket: 'test bucket',
+      key: 'test key',
+      rw: 3,
+      vclock: new Buffer([13, 19]),
+      r: 2,
+      w: 1,
+      pr: 7,
+      pw: 8,
+      dw: 9,
+      timeout: 77272,
+      sloppy_quorum: false,
+      n_val: 3,
+      type: 'test type'
+    }, 'RpbDelReq');
   });
 
   bodyless(14, 'RpbDelResp');
@@ -412,13 +388,10 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbListBucketsReq',
-      data: {
-        timeout: 77272,
-        stream: false,
-        type: 'test type'
-      }
-    });
+      timeout: 77272,
+      stream: false,
+      type: 'test type'
+    }, 'RpbListBucketsReq');
   });
 
   it('should encode RpbListBucketsResp', function (done) {
@@ -433,16 +406,13 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbListBucketsResp',
-      data: {
-        buckets: [
-          'bucket1',
-          'bucket2',
-          'bucket3'
-        ],
-        done: true
-      }
-    });
+      buckets: [
+        'bucket1',
+        'bucket2',
+        'bucket3'
+      ],
+      done: true
+    }, 'RpbListBucketsResp');
   });
 
   it('should encode RpbListKeysReq', function (done) {
@@ -456,13 +426,10 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbListKeysReq',
-      data: {
-        bucket: 'test bucket',
-        timeout: 77272,
-        type: 'test type'
-      }
-    });
+      bucket: 'test bucket',
+      timeout: 77272,
+      type: 'test type'
+    }, 'RpbListKeysReq');
   });
 
   it('should encode RpbListKeysResp', function (done) {
@@ -477,16 +444,13 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbListKeysResp',
-      data: {
-        keys: [
-          'key1',
-          'key2',
-          'key3'
-        ],
-        done: true
-      }
-    });
+      keys: [
+        'key1',
+        'key2',
+        'key3'
+      ],
+      done: true
+    }, 'RpbListKeysResp');
   });
 
   it('should encode RpbGetBucketReq', function (done) {
@@ -499,12 +463,9 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbGetBucketReq',
-      data: {
-        bucket: 'test bucket',
-        type: 'test type'
-      }
-    });
+      bucket: 'test bucket',
+      type: 'test type'
+    }, 'RpbGetBucketReq');
   });
 
   it('should encode RpbGetBucketResp', function (done) {
@@ -516,11 +477,8 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbGetBucketResp',
-      data: {
-        props: testBucketProps.data
-      }
-    });
+      props: testBucketProps.data
+    }, 'RpbGetBucketResp');
   });
 
   it('should encode RpbSetBucketReq', function (done) {
@@ -532,13 +490,10 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbSetBucketReq',
-      data: {
-        bucket: 'test bucket',
-        props: testBucketProps.data,
-        type: 'test type'
-      }
-    });
+      bucket: 'test bucket',
+      props: testBucketProps.data,
+      type: 'test type'
+    }, 'RpbSetBucketReq');
   });
 
   bodyless(22, 'RpbSetBucketResp');
@@ -570,12 +525,9 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbMapRedReq',
-      data: {
-        request: request,
-        content_type: 'application/json'
-      }
-    });
+      request: request,
+      content_type: 'application/json'
+    }, 'RpbMapRedReq');
   });
 
   it('should encode RpbMapRedResp', function (done) {
@@ -592,13 +544,10 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbMapRedResp',
-      data: {
-        phase: 1,
-        response: response,
-        done: true
-      }
-    });
+      phase: 1,
+      response: response,
+      done: true
+    }, 'RpbMapRedResp');
   });
 
   it('should encode RpbIndexReq', function (done) {
@@ -623,24 +572,21 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbIndexReq',
-      data: {
-        bucket: 'test bucket',
-        index: 'test index',
-        qtype: 'range',
-        key: 'test key',
-        range_min: 'test min',
-        range_max: 'test max',
-        return_terms: false,
-        stream: true,
-        max_results: 10,
-        continuation: new Buffer('test buffer'),
-        timeout: 10000,
-        type: 'test type',
-        term_regex: /.*/,
-        pagination_sort: false
-      }
-    });
+      bucket: 'test bucket',
+      index: 'test index',
+      qtype: 'range',
+      key: 'test key',
+      range_min: 'test min',
+      range_max: 'test max',
+      return_terms: false,
+      stream: true,
+      max_results: 10,
+      continuation: new Buffer('test buffer'),
+      timeout: 10000,
+      type: 'test type',
+      term_regex: /.*/,
+      pagination_sort: false
+    }, 'RpbIndexReq');
   });
 
   it('should encode RpbIndexResp', function (done) {
@@ -658,19 +604,16 @@ describe('Protocol Buffer Encoder', function () {
       done();
     });
     this.subject.write({
-      type: 'RpbIndexResp',
-      data: {
-        keys: ['test key'],
-        results: [
-          {
-            key: 'test key',
-            value: new Buffer('test value')
-          }
-        ],
-        continuation: new Buffer('test buffer'),
-        done: false
-      }
-    });
+      keys: ['test key'],
+      results: [
+        {
+          key: 'test key',
+          value: new Buffer('test value')
+        }
+      ],
+      continuation: new Buffer('test buffer'),
+      done: false
+    }, 'RpbIndexResp');
   });
 
 // 25,RpbIndexReq,riak_kv

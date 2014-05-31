@@ -1,11 +1,11 @@
 var assert = require('assert');
 
-var Chunker = require('../lib/index').Chunker;
+var FrameAligner = require('../lib/index').FrameAligner;
 
-describe('Protocol Buffer Chunker', function () {
+describe('Protocol Buffer FrameAligner', function () {
 
   beforeEach(function () {
-    this.subject = new Chunker();
+    this.subject = new FrameAligner();
   });
 
   it('should chunk one message', function (done) {

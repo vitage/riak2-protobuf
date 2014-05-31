@@ -1,7 +1,8 @@
-0.0.3-dev / 2014-00-00
+0.1.0-dev / 2014-00-00
 ==================
 
   * Rename to `riakjs2-protobuf`
+  * Simplify API
   * Pass-through events from underlying streams
   * Support decoding string MIME types
   * Handle encoding and decoding `RpbIndexReq` and `RpbIndexResp`

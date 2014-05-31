@@ -1,7 +1,7 @@
 var assert = require('assert');
 
-var ripepb = require('../lib/index');
-var Socket = ripepb.Socket;
+var riakpb = require('../lib/index');
+var Socket = riakpb.Socket;
 var MockSocket = require('./mock/socket');
 
 describe('Protocol Buffer Socket', function () {
@@ -23,20 +23,16 @@ describe('Protocol Buffer Socket', function () {
   });
 
   it('should === exports', function () {
-    assert.strictEqual(Socket, ripepb);
+    assert.strictEqual(Socket, riakpb);
   });
 
   it('should use pipeline', function (done) {
-    this.subject.write({
-      type: 'RpbGetServerInfoReq'
-    });
+    this.subject.write('RpbGetServerInfoReq');
     this.subject.once('data', function (data) {
+      assert.equal(data._type, 'RpbGetServerInfoResp');
       assert.deepEqual(data, {
-        type: 'RpbGetServerInfoResp',
-        result: {
-          node: 'riak@127.0.0.1',
-          server_version: '2.0.0beta1'
-        }
+        node: 'riak@127.0.0.1',
+        server_version: '2.0.0beta1'
       });
       done();
     }.bind(this));

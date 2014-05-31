@@ -1,18 +1,16 @@
 var assert = require('assert');
 
-var Decoder = require('../lib/index').Decoder;
+var Parser = require('../lib/index').Parser;
 var schema = require('../lib/index').schema;
 
 function bodyless (code, type) {
   it('should decode ' + type, function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, type);
+      assert.equal(data._type, type);
       done();
     });
     this.subject.write({
-      code: code,
-      size: 0,
-      data: null
+      code: code
     });
   });
 }
@@ -146,28 +144,28 @@ testBucketProps.data = {
   search_index: 'default'
 };
 
-describe('Protocol Buffer Decoder', function () {
+describe('Protocol Buffer Parser', function () {
 
   beforeEach(function () {
-    this.subject = new Decoder();
+    this.subject = new Parser();
   });
 
   it('should decode RpbErrorResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbErrorResp');
-      assert(data.error instanceof Error);
-      assert.equal(data.error.message, 'test message');
+      assert.equal(data._type, 'RpbErrorResp');
+      assert.equal(data.errmsg, 'test message');
+      assert.equal(data.errcode, 255);
       done();
     });
     var buf = new schema.RpbErrorResp({
       errmsg: 'test message',
-      errcode: -1
+      errcode: 255
     }).toBuffer();
     this.subject.write({
       code: 0,
       size: buf.length,
       data: buf
-    });
+    }, 0);
   });
 
   bodyless(1, 'RpbPingReq');
@@ -176,8 +174,8 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbGetClientIdResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbGetClientIdResp');
-      assert.equal(data.result.client_id, 'test client id');
+      assert.equal(data._type, 'RpbGetClientIdResp');
+      assert.equal(data.client_id, 'test client id');
       done();
     });
     var buf = new schema.RpbGetClientIdResp({
@@ -192,8 +190,8 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbSetClientIdReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbSetClientIdReq');
-      assert.equal(data.result.client_id, 'test client id');
+      assert.equal(data._type, 'RpbSetClientIdReq');
+      assert.equal(data.client_id, 'test client id');
       done();
     });
     var buf = new schema.RpbSetClientIdReq({
@@ -211,9 +209,9 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbGetServerInfoResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbGetServerInfoResp');
-      assert.equal(data.result.node, 'test node');
-      assert.equal(data.result.server_version, '2.0.0');
+      assert.equal(data._type, 'RpbGetServerInfoResp');
+      assert.equal(data.node, 'test node');
+      assert.equal(data.server_version, '2.0.0');
       done();
     });
     var buf = new schema.RpbGetServerInfoResp({
@@ -229,18 +227,18 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbGetReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbGetReq');
-      assert.equal(data.result.bucket, 'test bucket');
-      assert.equal(data.result.key, 'test key');
-      assert.equal(data.result.r, 3);
-      assert.equal(data.result.pr, 1);
-      assert.equal(data.result.basic_quorum, false);
-      assert.deepEqual([].slice.call(data.result.if_modified.toBuffer()), [13, 19]);
-      assert.equal(data.result.head, false);
-      assert.equal(data.result.timeout, 12345);
-      assert.equal(data.result.sloppy_quorum, false);
-      assert.equal(data.result.n_val, 1);
-      assert.equal(data.result.type, 'default');
+      assert.equal(data._type, 'RpbGetReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.key, 'test key');
+      assert.equal(data.r, 3);
+      assert.equal(data.pr, 1);
+      assert.equal(data.basic_quorum, false);
+      assert.deepEqual([].slice.call(data.if_modified.toBuffer()), [13, 19]);
+      assert.equal(data.head, false);
+      assert.equal(data.timeout, 12345);
+      assert.equal(data.sloppy_quorum, false);
+      assert.equal(data.n_val, 1);
+      assert.equal(data.type, 'default');
       done();
     });
     var buf = new schema.RpbGetReq({
@@ -267,11 +265,11 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbGetResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbGetResp');
-      assert.deepEqual([].slice.call(data.result.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.result.unchanged, false);
-      assert.equal(data.result.content.length, 1);
-      testContent(data.result.content[0]);
+      assert.equal(data._type, 'RpbGetResp');
+      assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
+      assert.equal(data.unchanged, false);
+      assert.equal(data.content.length, 1);
+      testContent(data.content[0]);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -292,7 +290,7 @@ describe('Protocol Buffer Decoder', function () {
       content_type: 'text/plain'
     };
     this.subject.on('data', function (data) {
-      assert.equal(data.result.content[0].value, content.value);
+      assert.equal(data.content[0].value, content.value);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -311,7 +309,7 @@ describe('Protocol Buffer Decoder', function () {
       content_type: 'application/xml'
     };
     this.subject.on('data', function (data) {
-      assert.equal(data.result.content[0].value, content.value);
+      assert.equal(data.content[0].value, content.value);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -330,7 +328,7 @@ describe('Protocol Buffer Decoder', function () {
       content_type: 'application/html'
     };
     this.subject.on('data', function (data) {
-      assert.equal(data.result.content[0].value, content.value);
+      assert.equal(data.content[0].value, content.value);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -349,7 +347,7 @@ describe('Protocol Buffer Decoder', function () {
       content_type: 'application/octet-stream'
     };
     this.subject.on('data', function (data) {
-      assert.deepEqual([].slice.call(data.result.content[0].value),
+      assert.deepEqual([].slice.call(data.content[0].value),
         [].slice.call(content.value));
       done();
     });
@@ -365,23 +363,23 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbPutReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbPutReq');
-      assert.equal(data.result.bucket, 'test bucket');
-      assert.equal(data.result.key, 'test key');
-      assert.deepEqual([].slice.call(data.result.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.result.w, 3);
-      assert.equal(data.result.dw, 2);
-      assert.equal(data.result.return_body, true);
-      assert.equal(data.result.pw, 1);
-      assert.equal(data.result.if_not_modified, true);
-      assert.equal(data.result.if_none_match, false);
-      assert.equal(data.result.return_head, false);
-      assert.equal(data.result.timeout, 77272);
-      assert.equal(data.result.asis, false);
-      assert.equal(data.result.sloppy_quorum, false);
-      assert.equal(data.result.n_val, 3);
-      assert.equal(data.result.type, 'test type');
-      testContent(data.result.content);
+      assert.equal(data._type, 'RpbPutReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.key, 'test key');
+      assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
+      assert.equal(data.w, 3);
+      assert.equal(data.dw, 2);
+      assert.equal(data.return_body, true);
+      assert.equal(data.pw, 1);
+      assert.equal(data.if_not_modified, true);
+      assert.equal(data.if_none_match, false);
+      assert.equal(data.return_head, false);
+      assert.equal(data.timeout, 77272);
+      assert.equal(data.asis, false);
+      assert.equal(data.sloppy_quorum, false);
+      assert.equal(data.n_val, 3);
+      assert.equal(data.type, 'test type');
+      testContent(data.content);
       done();
     });
     var buf = new schema.RpbPutReq({
@@ -411,11 +409,11 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbPutResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbPutResp');
-      assert.deepEqual([].slice.call(data.result.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.result.key, 'test key');
-      assert.equal(data.result.content.length, 1);
-      testContent(data.result.content[0]);
+      assert.equal(data._type, 'RpbPutResp');
+      assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
+      assert.equal(data.key, 'test key');
+      assert.equal(data.content.length, 1);
+      testContent(data.content[0]);
       done();
     });
     var buf = new schema.RpbPutResp({
@@ -432,20 +430,20 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbDelReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbDelReq');
-      assert.equal(data.result.bucket, 'test bucket');
-      assert.equal(data.result.key, 'test key');
-      assert.equal(data.result.rw, 3);
-      assert.deepEqual([].slice.call(data.result.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.result.r, 2);
-      assert.equal(data.result.w, 1);
-      assert.equal(data.result.pr, 7);
-      assert.equal(data.result.pw, 8);
-      assert.equal(data.result.dw, 9);
-      assert.equal(data.result.timeout, 77272);
-      assert.equal(data.result.sloppy_quorum, false);
-      assert.equal(data.result.n_val, 3);
-      assert.equal(data.result.type, 'test type');
+      assert.equal(data._type, 'RpbDelReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.key, 'test key');
+      assert.equal(data.rw, 3);
+      assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
+      assert.equal(data.r, 2);
+      assert.equal(data.w, 1);
+      assert.equal(data.pr, 7);
+      assert.equal(data.pw, 8);
+      assert.equal(data.dw, 9);
+      assert.equal(data.timeout, 77272);
+      assert.equal(data.sloppy_quorum, false);
+      assert.equal(data.n_val, 3);
+      assert.equal(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbDelReq({
@@ -474,10 +472,10 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbListBucketsReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbListBucketsReq');
-      assert.equal(data.result.timeout, 77272);
-      assert.equal(data.result.stream, false);
-      assert.equal(data.result.type, 'test type');
+      assert.equal(data._type, 'RpbListBucketsReq');
+      assert.equal(data.timeout, 77272);
+      assert.equal(data.stream, false);
+      assert.equal(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbListBucketsReq({
@@ -494,9 +492,9 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbListBucketsResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbListBucketsResp');
-      assert.deepEqual(data.result.buckets, ['bucket1', 'bucket2', 'bucket3']);
-      assert.equal(data.result.done, true);
+      assert.equal(data._type, 'RpbListBucketsResp');
+      assert.deepEqual(data.buckets, ['bucket1', 'bucket2', 'bucket3']);
+      assert.equal(data.done, true);
       done();
     });
     var buf = new schema.RpbListBucketsResp({
@@ -516,10 +514,10 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbListKeysReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbListKeysReq');
-      assert.equal(data.result.bucket, 'test bucket');
-      assert.equal(data.result.timeout, 77272);
-      assert.equal(data.result.type, 'test type');
+      assert.equal(data._type, 'RpbListKeysReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.timeout, 77272);
+      assert.equal(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbListKeysReq({
@@ -536,9 +534,9 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbListKeysResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbListKeysResp');
-      assert.deepEqual(data.result.keys, ['key1', 'key1', 'key1']);
-      assert.equal(data.result.done, true);
+      assert.equal(data._type, 'RpbListKeysResp');
+      assert.deepEqual(data.keys, ['key1', 'key1', 'key1']);
+      assert.equal(data.done, true);
       done();
     });
     var buf = new schema.RpbListKeysResp({
@@ -558,9 +556,9 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbGetBucketReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbGetBucketReq');
-      assert.equal(data.result.bucket, 'test bucket');
-      assert.equal(data.result.type, 'test type');
+      assert.equal(data._type, 'RpbGetBucketReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbGetBucketReq({
@@ -576,8 +574,8 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbGetBucketResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbGetBucketResp');
-      testBucketProps(data.result.props);
+      assert.equal(data._type, 'RpbGetBucketResp');
+      testBucketProps(data.props);
       done();
     });
     var buf = new schema.RpbGetBucketResp({
@@ -592,8 +590,8 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbSetBucketReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbSetBucketReq');
-      testBucketProps(data.result.props);
+      assert.equal(data._type, 'RpbSetBucketReq');
+      testBucketProps(data.props);
       done();
     });
     var buf = new schema.RpbSetBucketReq({
@@ -631,9 +629,9 @@ describe('Protocol Buffer Decoder', function () {
       return value;
     });
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbMapRedReq');
-      assert.deepEqual(data.result.request, JSON.parse(request));
-      assert.equal(data.result.content_type, 'application/json');
+      assert.equal(data._type, 'RpbMapRedReq');
+      assert.deepEqual(data.request, JSON.parse(request));
+      assert.equal(data.content_type, 'application/json');
       done();
     });
     var buf = new schema.RpbMapRedReq({
@@ -652,10 +650,10 @@ describe('Protocol Buffer Decoder', function () {
       [['foo', 1],['baz', 0],['bar', 4],['bam', 3]]
     );
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbMapRedResp');
-      assert.equal(data.result.phase, 1);
-      assert.deepEqual(data.result.response, response);
-      assert.equal(data.result.done, true);
+      assert.equal(data._type, 'RpbMapRedResp');
+      assert.equal(data.phase, 1);
+      assert.deepEqual(data.response, response);
+      assert.equal(data.done, true);
       done();
     });
     var buf = new schema.RpbMapRedResp({
@@ -672,23 +670,23 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbIndexReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbIndexReq');
-      assert.equal(data.result.bucket, 'test bucket');
-      assert.equal(data.result.index, 'test index');
-      assert.equal(data.result.qtype, 'range');
-      assert.equal(data.result.key, 'test key');
-      assert.equal(data.result.range_min, 'test min');
-      assert.equal(data.result.range_max, 'test max');
-      assert.equal(data.result.return_terms, false);
-      assert.equal(data.result.stream, true);
-      assert.equal(data.result.max_results, 10);
-      assert(Buffer.isBuffer(data.result.continuation));
-      assert.equal(data.result.continuation.toString('utf8'), 'test buffer');
-      assert.equal(data.result.timeout, 10000);
-      assert.equal(data.result.type, 'test type');
-      assert(data.result.term_regex instanceof RegExp);
-      assert.equal(data.result.term_regex.source, '.*');
-      assert.equal(data.result.pagination_sort, false);
+      assert.equal(data._type, 'RpbIndexReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.index, 'test index');
+      assert.equal(data.qtype, 'range');
+      assert.equal(data.key, 'test key');
+      assert.equal(data.range_min, 'test min');
+      assert.equal(data.range_max, 'test max');
+      assert.equal(data.return_terms, false);
+      assert.equal(data.stream, true);
+      assert.equal(data.max_results, 10);
+      assert(Buffer.isBuffer(data.continuation));
+      assert.equal(data.continuation.toString('utf8'), 'test buffer');
+      assert.equal(data.timeout, 10000);
+      assert.equal(data.type, 'test type');
+      assert(data.term_regex instanceof RegExp);
+      assert.equal(data.term_regex.source, '.*');
+      assert.equal(data.pagination_sort, false);
       done();
     });
     var buf = new schema.RpbIndexReq({
@@ -716,14 +714,14 @@ describe('Protocol Buffer Decoder', function () {
 
   it('should decode RpbIndexResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data.type, 'RpbIndexResp');
-      assert.deepEqual(data.result.keys, ['test key']);
-      assert.equal(data.result.results.length, 1);
-      assert.equal(data.result.results[0].key, 'test key');
-      assert.equal(data.result.results[0].value, 'test value');
-      assert(Buffer.isBuffer(data.result.continuation));
-      assert.equal(data.result.continuation.toString('utf8'), 'test buffer');
-      assert.equal(data.result.done, false);
+      assert.equal(data._type, 'RpbIndexResp');
+      assert.deepEqual(data.keys, ['test key']);
+      assert.equal(data.results.length, 1);
+      assert.equal(data.results[0].key, 'test key');
+      assert.equal(data.results[0].value, 'test value');
+      assert(Buffer.isBuffer(data.continuation));
+      assert.equal(data.continuation.toString('utf8'), 'test buffer');
+      assert.equal(data.done, false);
       done();
     });
     var buf = new schema.RpbIndexResp({

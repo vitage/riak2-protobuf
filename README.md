@@ -8,16 +8,12 @@ A Riak Protocol Buffer stream for Node.JS.
 var RiakSocket = require('riakjs2-protobuf');
 var socket = new RiakSocket();
 
-socket.write({
-  type: 'RpbGetServerInfoReq'
-});
+socket.write('RpbGetServerInfoReq');
 
 socket.once('data', function (data) {
   console.log(data);
-  // { type: 'RpbGetServerInfoResp',
-  //   result: {
-  //     node: 'riak@127.0.0.1',
-  //     server_version: '2.0.0beta1' } }
+  // { node: 'riak@127.0.0.1',
+  //   server_version: '2.0.0beta1' }
 });
 
 ```
