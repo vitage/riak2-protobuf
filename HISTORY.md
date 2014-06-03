@@ -1,7 +1,7 @@
-0.1.0-dev / 2014-05-31
+0.1.0 / 2014-06-02
 ==================
 
-  * Rename to `riakjs2-protobuf`
+  * Rename to `riak2-protobuf`
   * Simplify API
   * Pass-through events from underlying streams
   * Support decoding string MIME types

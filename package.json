@@ -1,9 +1,9 @@
 {
-  "name": "riakjs2-protobuf",
+  "name": "riak2-protobuf",
   "version": "0.1.0",
   "description": "Riak Protocol Buffer stream for Node.JS",
   "main": "lib/index.js",
-  "repository": "https://github.com/mikepb/riakjs2-protobuf.git",
+  "repository": "https://github.com/mikepb/riak2-protobuf.git",
   "scripts": {
     "test": "mocha --reporter spec"
   },
