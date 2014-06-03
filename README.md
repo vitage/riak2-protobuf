@@ -1,11 +1,11 @@
-# Riak Stream
+# Riak Protocol Buffer Stream
 
-[![Build Status](https://travis-ci.org/mikepb/riakjs2-protobuf.svg)](https://travis-ci.org/mikepb/riakjs2-protobuf)
+[![Build Status](https://travis-ci.org/mikepb/riak2-protobuf.svg)](https://travis-ci.org/mikepb/riak2-protobuf)
 
 A Riak Protocol Buffer stream for Node.JS.
 
 ```js
-var RiakSocket = require('riakjs2-protobuf');
+var RiakSocket = require('riak2-protobuf');
 var socket = new RiakSocket();
 
 socket.write('RpbGetServerInfoReq');
