@@ -637,8 +637,208 @@ describe('Protocol Buffer Serializer', function () {
 // 58,RpbYokozunaSchemaGetReq,riak_yokozuna
 // 59,RpbYokozunaSchemaGetResp,riak_yokozuna
 // 60,RpbYokozunaSchemaPutReq,riak_yokozuna
-// 80,DtFetchReq,riak_dt
-// 81,DtFetchResp,riak_dt
+
+  it('should encode DtFetchReq', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 80);
+      var data = schema.DtFetchReq.decode(buf.slice(5));
+      assert.equal(data.bucket.toString('utf8'), 'test bucket');
+      assert.equal(data.key.toString('utf8'), 'test key');
+      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.equal(data.r, 1);
+      assert.equal(data.pr, 2);
+      assert.equal(data.basic_quorum, false);
+      assert.equal(data.notfound_ok, false);
+      assert.equal(data.timeout, 1000);
+      assert.equal(data.sloppy_quorum, false);
+      assert.equal(data.n_val, 4);
+      done();
+    });
+    this.subject.write({
+      bucket: 'test bucket',
+      key: 'test key',
+      type: 'test type',
+      r: 1,
+      pr: 2,
+      basic_quorum: false,
+      notfound_ok: false,
+      timeout: 1000,
+      sloppy_quorum: false,
+      n_val: 4
+    }, 'DtFetchReq');
+  });
+
+  it('should encode DtFetchResp with counter', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 81);
+      var data = schema.DtFetchResp.decode(buf.slice(5));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.type, 1);
+      assert.deepEqual(data.value, {
+        counter_value: {
+          low: 199,
+          high: 0,
+          unsigned: false
+        },
+        set_value: [],
+        map_value: []
+      });
+      done();
+    });
+    this.subject.write({
+      context: 'some context',
+      type: 1,
+      value: {
+        counter_value: 199
+      }
+    }, 'DtFetchResp');
+  });
+
+  it('should encode DtFetchResp with set', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 81);
+      var data = schema.DtFetchResp.decode(buf.slice(5));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.type, 2);
+      assert(data.value);
+      assert.equal(data.value.counter_value, null);
+      assert.equal(data.value.set_value.length, 3);
+      assert.equal(data.value.set_value[0].toString('utf8'), 'foo');
+      assert.equal(data.value.set_value[1].toString('utf8'), 'bar');
+      assert.equal(data.value.set_value[2].toString('utf8'), 'baz');
+      assert.deepEqual(data.value.map_value, []);
+      done();
+    });
+    this.subject.write({
+      context: 'some context',
+      type: 2,
+      value: {
+        set_value: ['foo', 'bar', 'baz']
+      }
+    }, 'DtFetchResp');
+  });
+
+  it('should encode DtFetchResp with map', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 81);
+      var data = schema.DtFetchResp.decode(buf.slice(5));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.type, 3);
+      assert(data.value);
+      assert.equal(data.value.counter_value, null);
+      assert.deepEqual(data.value.set_value, []);
+      assert.equal(data.value.map_value.length, 5)
+
+      assert.equal(data.value.map_value[0].field.name.toString('utf8'), 'counter1');
+      assert.equal(data.value.map_value[0].field.type, 1);
+      assert.equal(data.value.map_value[0].counter_value, 881);
+      assert.equal(data.value.map_value[0].set_value.length, 0);
+      assert.equal(data.value.map_value[0].register_value, null);
+      assert.equal(data.value.map_value[0].flag_value, null);
+      assert.equal(data.value.map_value[0].map_value.length, 0);
+
+      assert.equal(data.value.map_value[1].field.name.toString('utf8'), 'set2');
+      assert.equal(data.value.map_value[1].field.type, 2);
+      assert.equal(data.value.map_value[1].counter_value, null);
+      assert.equal(data.value.map_value[1].set_value.length, 3);
+      assert.equal(data.value.map_value[1].set_value[0].toString('utf8'), 'foo');
+      assert.equal(data.value.map_value[1].set_value[1].toString('utf8'), 'bar');
+      assert.equal(data.value.map_value[1].set_value[2].toString('utf8'), 'baz');
+      assert.equal(data.value.map_value[1].register_value, null);
+      assert.equal(data.value.map_value[1].flag_value, null);
+      assert.equal(data.value.map_value[1].map_value.length, 0);
+
+      assert.equal(data.value.map_value[2].field.name.toString('utf8'), 'register3');
+      assert.equal(data.value.map_value[2].field.type, 3);
+      assert.equal(data.value.map_value[2].counter_value, null);
+      assert.equal(data.value.map_value[2].set_value.length, 0);
+      assert.equal(data.value.map_value[2].register_value.toString('utf8'), 'xyzzy');
+      assert.equal(data.value.map_value[2].flag_value, null);
+      assert.equal(data.value.map_value[2].map_value.length, 0);
+
+      assert.equal(data.value.map_value[3].field.name.toString('utf8'), 'flag4');
+      assert.equal(data.value.map_value[3].field.type, 4);
+      assert.equal(data.value.map_value[3].counter_value, null);
+      assert.equal(data.value.map_value[3].set_value.length, 0);
+      assert.equal(data.value.map_value[3].register_value, null);
+      assert.equal(data.value.map_value[3].flag_value, true);
+      assert.equal(data.value.map_value[3].map_value.length, 0);
+
+      assert.equal(data.value.map_value[4].field.name.toString('utf8'), 'map5');
+      assert.equal(data.value.map_value[4].field.type, 5);
+      assert.equal(data.value.map_value[4].counter_value, null);
+      assert.equal(data.value.map_value[4].set_value.length, 0);
+      assert.equal(data.value.map_value[4].register_value, null);
+      assert.equal(data.value.map_value[4].flag_value, null);
+      assert.equal(data.value.map_value[4].map_value.length, 1);
+
+      assert.equal(data.value.map_value[4].map_value[0].field.name.toString('utf8'), 'counter1.1');
+      assert.equal(data.value.map_value[4].map_value[0].field.type, 1);
+      assert.equal(data.value.map_value[4].map_value[0].counter_value, 67);
+      assert.equal(data.value.map_value[4].map_value[0].set_value.length, 0);
+      assert.equal(data.value.map_value[4].map_value[0].register_value, null);
+      assert.equal(data.value.map_value[4].map_value[0].flag_value, null);
+      assert.equal(data.value.map_value[4].map_value[0].map_value.length, 0);
+
+      done();
+    });
+    this.subject.write({
+      context: 'some context',
+      type: 3,
+      value: {
+        map_value: [
+          {
+            field: {
+              name: 'counter1',
+              type: 1
+            },
+            counter_value: 881
+          },
+          {
+            field: {
+              name: 'set2',
+              type: 2
+            },
+            set_value: ['foo', 'bar', 'baz']
+          },
+          {
+            field: {
+              name: 'register3',
+              type: 3
+            },
+            register_value: 'xyzzy'
+          },
+          {
+            field: {
+              name: 'flag4',
+              type: 4
+            },
+            flag_value: true
+          },
+          {
+            field: {
+              name: 'map5',
+              type: 5
+            },
+            map_value: [
+              {
+                field: {
+                  name: 'counter1.1',
+                  type: 1
+                },
+                counter_value: 67
+              }
+            ]
+          }
+        ]
+      }
+    }, 'DtFetchResp');
+  });
+
 // 82,DtUpdateReq,riak_dt
 // 83,DtUpdateResp,riak_dt
 // 253,RpbAuthReq,riak

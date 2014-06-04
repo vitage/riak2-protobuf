@@ -781,8 +781,232 @@ describe('Protocol Buffer Parser', function () {
 // 58,RpbYokozunaSchemaGetReq,riak_yokozuna
 // 59,RpbYokozunaSchemaGetResp,riak_yokozuna
 // 60,RpbYokozunaSchemaPutReq,riak_yokozuna
-// 80,DtFetchReq,riak_dt
-// 81,DtFetchResp,riak_dt
+
+  it('should decode DtFetchReq', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'DtFetchReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.key, 'test key');
+      assert.equal(data.type, 'test type');
+      assert.equal(data.r, 1);
+      assert.equal(data.pr, 2);
+      assert.equal(data.basic_quorum, false);
+      assert.equal(data.notfound_ok, false);
+      assert.equal(data.timeout, 1000);
+      assert.equal(data.sloppy_quorum, false);
+      assert.equal(data.n_val, 4);
+      done();
+    });
+    var buf = new schema.DtFetchReq({
+      bucket: 'test bucket',
+      key: 'test key',
+      type: 'test type',
+      r: 1,
+      pr: 2,
+      basic_quorum: false,
+      notfound_ok: false,
+      timeout: 1000,
+      sloppy_quorum: false,
+      n_val: 4
+    }).toBuffer();
+    this.subject.write({
+      code: 80,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode DtFetchResp with counter', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'DtFetchResp');
+      assert(Buffer.isBuffer(data.context));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.type, 'counter');
+      assert.deepEqual(data.value, {
+        counter_value: 199,
+        set_value: [],
+        map_value: []
+      });
+      done();
+    });
+    var buf = new schema.DtFetchResp({
+      context: 'some context',
+      type: 1,
+      value: {
+        counter_value: 199
+      }
+    }).toBuffer();
+    this.subject.write({
+      code: 81,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode DtFetchResp with set', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'DtFetchResp');
+      assert(Buffer.isBuffer(data.context));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.type, 'set');
+      assert.deepEqual(data.value, {
+        counter_value: null,
+        set_value: ['foo', 'bar', 'baz'],
+        map_value: []
+      });
+      done();
+    });
+    var buf = new schema.DtFetchResp({
+      context: 'some context',
+      type: 2,
+      value: {
+        set_value: ['foo', 'bar', 'baz']
+      }
+    }).toBuffer();
+    this.subject.write({
+      code: 81,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode DtFetchResp with map', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'DtFetchResp');
+      assert(Buffer.isBuffer(data.context));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.type, 'map');
+      assert(data.value);
+      assert.equal(data.value.counter_value, null);
+      assert.deepEqual(data.value.set_value, []);
+      assert.equal(data.value.map_value.length, 5)
+      assert.deepEqual(data.value.map_value[0], {
+        field: {
+          name: 'counter1',
+          type: 'counter'
+        },
+        counter_value: 881,
+        set_value: [],
+        register_value: null,
+        flag_value: null,
+        map_value: []
+      });
+      assert.deepEqual(data.value.map_value[1], {
+        field: {
+          name: 'set2',
+          type: 'set'
+        },
+        counter_value: null,
+        set_value: ['foo', 'bar', 'baz'],
+        register_value: null,
+        flag_value: null,
+        map_value: []
+      });
+      assert.deepEqual(data.value.map_value[2], {
+        field: {
+          name: 'register3',
+          type: 'register'
+        },
+        counter_value: null,
+        set_value: [],
+        register_value: 'xyzzy',
+        flag_value: null,
+        map_value: []
+      });
+      assert.deepEqual(data.value.map_value[3], {
+        field: {
+          name: 'flag4',
+          type: 'flag'
+        },
+        counter_value: null,
+        set_value: [],
+        register_value: null,
+        flag_value: true,
+        map_value: []
+      });
+      assert.deepEqual(data.value.map_value[4], {
+        field: {
+          name: 'map5',
+          type: 'map'
+        },
+        counter_value: null,
+        set_value: [],
+        register_value: null,
+        flag_value: null,
+        map_value: [
+          {
+            field: {
+              name: 'counter1.1',
+              type: 'counter'
+            },
+            counter_value: 67,
+            set_value: [],
+            register_value: null,
+            flag_value: null,
+            map_value: [],
+          }
+        ]
+      });
+      done();
+    });
+    var buf = new schema.DtFetchResp({
+      context: 'some context',
+      type: 3,
+      value: {
+        map_value: [
+          {
+            field: {
+              name: 'counter1',
+              type: 1
+            },
+            counter_value: 881
+          },
+          {
+            field: {
+              name: 'set2',
+              type: 2
+            },
+            set_value: ['foo', 'bar', 'baz']
+          },
+          {
+            field: {
+              name: 'register3',
+              type: 3
+            },
+            register_value: 'xyzzy'
+          },
+          {
+            field: {
+              name: 'flag4',
+              type: 4
+            },
+            flag_value: true
+          },
+          {
+            field: {
+              name: 'map5',
+              type: 5
+            },
+            map_value: [
+              {
+                field: {
+                  name: 'counter1.1',
+                  type: 1
+                },
+                counter_value: 67
+              }
+            ]
+          }
+        ]
+      }
+    }).toBuffer();
+    this.subject.write({
+      code: 81,
+      size: buf.length,
+      data: buf
+    });
+  });
+
 // 82,DtUpdateReq,riak_dt
 // 83,DtUpdateResp,riak_dt
 // 253,RpbAuthReq,riak

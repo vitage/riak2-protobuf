@@ -1,6 +1,6 @@
 {
   "name": "riak2-protobuf",
-  "version": "0.1.0",
+  "version": "0.1.1-dev",
   "description": "Riak Protocol Buffer stream for Node.JS",
   "main": "lib/index.js",
   "repository": "https://github.com/mikepb/riak2-protobuf.git",
@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^2.4.1",
+    "node-int64": "^0.3.1",
     "protobufjs": "^2.0.5"
   },
   "devDependencies": {
