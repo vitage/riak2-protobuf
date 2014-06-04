@@ -689,7 +689,7 @@ describe('Protocol Buffer Serializer', function () {
     });
     this.subject.write({
       context: 'some context',
-      type: 1,
+      type: 'counter',
       value: {
         counter_value: 199
       }
@@ -714,7 +714,7 @@ describe('Protocol Buffer Serializer', function () {
     });
     this.subject.write({
       context: 'some context',
-      type: 2,
+      type: 'set',
       value: {
         set_value: ['foo', 'bar', 'baz']
       }
@@ -788,47 +788,47 @@ describe('Protocol Buffer Serializer', function () {
     });
     this.subject.write({
       context: 'some context',
-      type: 3,
+      type: 'map',
       value: {
         map_value: [
           {
             field: {
               name: 'counter1',
-              type: 1
+              type: 'counter'
             },
             counter_value: 881
           },
           {
             field: {
               name: 'set2',
-              type: 2
+              type: 'set'
             },
             set_value: ['foo', 'bar', 'baz']
           },
           {
             field: {
               name: 'register3',
-              type: 3
+              type: 'register'
             },
             register_value: 'xyzzy'
           },
           {
             field: {
               name: 'flag4',
-              type: 4
+              type: 'flag'
             },
             flag_value: true
           },
           {
             field: {
               name: 'map5',
-              type: 5
+              type: 'map'
             },
             map_value: [
               {
                 field: {
                   name: 'counter1.1',
-                  type: 1
+                  type: 'counter'
                 },
                 counter_value: 67
               }
@@ -839,8 +839,182 @@ describe('Protocol Buffer Serializer', function () {
     }, 'DtFetchResp');
   });
 
-// 82,DtUpdateReq,riak_dt
-// 83,DtUpdateResp,riak_dt
+  it('should encode DtUpdateReq', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 82);
+      var data = schema.DtUpdateReq.decode(buf.slice(5));
+      assert.equal(data.bucket.toString('utf8'), 'test bucket');
+      assert.equal(data.key.toString('utf8'), 'test key');
+      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.equal(data.context.toString('utf8'), 'some context');
+
+      assert.equal(data.op.counter_op.increment, 1);
+      assert.equal(data.op.set_op.adds.length, 1);
+      assert.equal(data.op.set_op.adds[0].toString('utf8'), 'foo');
+      assert.equal(data.op.set_op.removes.length, 1);
+      assert.equal(data.op.set_op.removes[0].toString('utf8'), 'bar');
+      assert.equal(data.op.map_op.adds.length, 1);
+      assert.equal(data.op.map_op.adds[0].name.toString('utf8'), 'counter1');
+      assert.equal(data.op.map_op.adds[0].type, 1);
+      assert.equal(data.op.map_op.removes.length, 1);
+      assert.equal(data.op.map_op.removes[0].name.toString('utf8'), 'set2');
+      assert.equal(data.op.map_op.removes[0].type, 2);
+      assert.equal(data.op.map_op.updates.length, 5);
+      assert.equal(data.op.map_op.updates[0].field.name.toString('utf8'), 'counter1');
+      assert.equal(data.op.map_op.updates[0].field.type, 1);
+      assert.equal(data.op.map_op.updates[0].counter_op.increment, 1);
+      assert.equal(data.op.map_op.updates[1].field.name.toString('utf8'), 'set2');
+      assert.equal(data.op.map_op.updates[1].field.type, 2);
+      assert.equal(data.op.map_op.updates[1].set_op.adds.length, 1);
+      assert.equal(data.op.map_op.updates[1].set_op.adds[0].toString('utf8'), 'foo');
+      assert.equal(data.op.map_op.updates[1].set_op.removes.length, 1);
+      assert.equal(data.op.map_op.updates[1].set_op.removes[0].toString('utf8'), 'bar');
+      assert.equal(data.op.map_op.updates[2].field.name.toString('utf8'), 'register3');
+      assert.equal(data.op.map_op.updates[2].field.type, 3);
+      assert.equal(data.op.map_op.updates[2].register_op.toString('utf8'), 'xyzzy');
+      assert.equal(data.op.map_op.updates[3].field.name.toString('utf8'), 'flag4');
+      assert.equal(data.op.map_op.updates[3].field.type, 4);
+      assert.equal(data.op.map_op.updates[3].flag_op, 2);
+      assert.equal(data.op.map_op.updates[4].field.name.toString('utf8'), 'map5');
+      assert.equal(data.op.map_op.updates[4].field.type, 5);
+      assert.equal(data.op.map_op.updates[4].map_op.adds.length, 1);
+      assert.equal(data.op.map_op.updates[4].map_op.adds[0].name.toString('utf8'), 'flag44');
+      assert.equal(data.op.map_op.updates[4].map_op.adds[0].type, 4);
+
+      assert.equal(data.w, 6);
+      assert.equal(data.dw, 7);
+      assert.equal(data.pw, 8);
+      assert.equal(data.return_body, true);
+      assert.equal(data.timeout, 10);
+      assert.equal(data.sloppy_quorum, true);
+      assert.equal(data.n_val, 12);
+      assert.equal(data.include_context, false);
+      done();
+    });
+    this.subject.write({
+      bucket: 'test bucket',
+      key: 'test key',
+      type: 'test type',
+      context: 'some context',
+      op: {
+        counter_op: {
+          increment: 1
+        },
+        set_op: {
+          adds: ['foo'],
+          removes: ['bar']
+        },
+        map_op: {
+          adds: [
+            {
+              name: 'counter1',
+              type: 1
+            }
+          ],
+          removes: [
+            {
+              name: 'set2',
+              type: 2
+            }
+          ],
+          updates: [
+            {
+              field: {
+                name: 'counter1',
+                type: 1
+              },
+              counter_op: {
+                increment: 1
+              }
+            },
+            {
+              field: {
+                name: 'set2',
+                type: 2
+              },
+              set_op: {
+                adds: ['foo'],
+                removes: ['bar']
+              }
+            },
+            {
+              field: {
+                name: 'register3',
+                type: 3
+              },
+              register_op: 'xyzzy'
+            },
+            {
+              field: {
+                name: 'flag4',
+                type: 4
+              },
+              flag_op: 2
+            },
+            {
+              field: {
+                name: 'map5',
+                type: 5
+              },
+              map_op: {
+                adds: [
+                  {
+                    name: 'flag44',
+                    type: 4
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      w: 6,
+      dw: 7,
+      pw: 8,
+      return_body: true,
+      timeout: 10,
+      sloppy_quorum: true,
+      n_val: 12,
+      include_context: false
+    }, 'DtUpdateReq');
+  });
+
+  it('should encode DtUpdateResp', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.equal(buf.readUInt32BE(0), buf.length - 4);
+      assert.equal(buf[4], 83);
+      var data = schema.DtUpdateResp.decode(buf.slice(5));
+      assert.equal(data.key.toString('utf8'), 'test key');
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.counter_value, 199);
+      assert.equal(data.set_value.length, 3);
+      assert.equal(data.set_value[0].toString('utf8'), 'foo');
+      assert.equal(data.set_value[1].toString('utf8'), 'bar');
+      assert.equal(data.set_value[2].toString('utf8'), 'baz');
+      assert.equal(data.map_value.length, 1);
+      assert.equal(data.map_value[0].field.name.toString('utf8'), 'dory');
+      assert.equal(data.map_value[0].field.type, 4);
+      assert.equal(data.map_value[0].flag_value, true);
+      done();
+    });
+    this.subject.write({
+      key: 'test key',
+      context: 'some context',
+      counter_value: 199,
+      set_value: ['foo', 'bar', 'baz'],
+      map_value: [
+        {
+          field: {
+            name: 'dory',
+            type: 4
+          },
+          flag_value: true
+        }
+      ]
+    }, 'DtUpdateResp');
+  });
+
 // 253,RpbAuthReq,riak
 // 254,RpbAuthResp,riak
 // 255,RpbStartTls,riak

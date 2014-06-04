@@ -2,6 +2,7 @@
 ======================
 
   * Implement `DtFetchReq` and `DtFetchResp`
+  * Implement `DtUpdateReq` and `DtUpdateResp`
 
 
 0.1.0 / 2014-06-02

@@ -80,8 +80,6 @@ return data from Riak as-is:
 58,RpbYokozunaSchemaGetReq,riak_yokozuna
 59,RpbYokozunaSchemaGetResp,riak_yokozuna
 60,RpbYokozunaSchemaPutReq,riak_yokozuna
-82,DtUpdateReq,riak_dt
-83,DtUpdateResp,riak_dt
 253,RpbAuthReq,riak
 254,RpbAuthResp,riak
 255,RpbStartTls,riak

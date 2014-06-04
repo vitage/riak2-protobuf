@@ -795,6 +795,7 @@ describe('Protocol Buffer Parser', function () {
       assert.equal(data.timeout, 1000);
       assert.equal(data.sloppy_quorum, false);
       assert.equal(data.n_val, 4);
+      assert.equal(data.include_context, false);
       done();
     });
     var buf = new schema.DtFetchReq({
@@ -807,7 +808,8 @@ describe('Protocol Buffer Parser', function () {
       notfound_ok: false,
       timeout: 1000,
       sloppy_quorum: false,
-      n_val: 4
+      n_val: 4,
+      include_context: false
     }).toBuffer();
     this.subject.write({
       code: 80,
@@ -1007,8 +1009,190 @@ describe('Protocol Buffer Parser', function () {
     });
   });
 
-// 82,DtUpdateReq,riak_dt
-// 83,DtUpdateResp,riak_dt
+  it('should decode DtUpdateReq', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'DtUpdateReq');
+      assert.equal(data.bucket, 'test bucket');
+      assert.equal(data.key, 'test key');
+      assert.equal(data.type, 'test type');
+      assert(Buffer.isBuffer(data.context));
+      assert.equal(data.context.toString('utf8'), 'some context');
+
+      assert.equal(data.op.counter_op.increment, 1);
+      assert.equal(data.op.set_op.adds.length, 1);
+      assert.equal(data.op.set_op.adds[0], 'foo');
+      assert.equal(data.op.set_op.removes.length, 1);
+      assert.equal(data.op.set_op.removes[0], 'bar');
+      assert.equal(data.op.map_op.adds.length, 1);
+      assert.equal(data.op.map_op.adds[0].name, 'counter1');
+      assert.equal(data.op.map_op.adds[0].type, 'counter');
+      assert.equal(data.op.map_op.removes.length, 1);
+      assert.equal(data.op.map_op.removes[0].name, 'set2');
+      assert.equal(data.op.map_op.removes[0].type, 'set');
+      assert.equal(data.op.map_op.updates.length, 5);
+      assert.equal(data.op.map_op.updates[0].field.name, 'counter1');
+      assert.equal(data.op.map_op.updates[0].field.type, 'counter');
+      assert.equal(data.op.map_op.updates[0].counter_op.increment, 1);
+      assert.equal(data.op.map_op.updates[1].field.name, 'set2');
+      assert.equal(data.op.map_op.updates[1].field.type, 'set');
+      assert.equal(data.op.map_op.updates[1].set_op.adds.length, 1);
+      assert.equal(data.op.map_op.updates[1].set_op.adds[0], 'foo');
+      assert.equal(data.op.map_op.updates[1].set_op.removes.length, 1);
+      assert.equal(data.op.map_op.updates[1].set_op.removes[0], 'bar');
+      assert.equal(data.op.map_op.updates[2].field.name, 'register3');
+      assert.equal(data.op.map_op.updates[2].field.type, 'register');
+      assert.equal(data.op.map_op.updates[2].register_op, 'xyzzy');
+      assert.equal(data.op.map_op.updates[3].field.name, 'flag4');
+      assert.equal(data.op.map_op.updates[3].field.type, 'flag');
+      assert.equal(data.op.map_op.updates[3].flag_op, 'disable');
+      assert.equal(data.op.map_op.updates[4].field.name, 'map5');
+      assert.equal(data.op.map_op.updates[4].field.type, 'map');
+      assert.equal(data.op.map_op.updates[4].map_op.adds.length, 1);
+      assert.equal(data.op.map_op.updates[4].map_op.adds[0].name, 'flag44');
+      assert.equal(data.op.map_op.updates[4].map_op.adds[0].type, 'flag');
+
+      assert.equal(data.w, 6);
+      assert.equal(data.dw, 7);
+      assert.equal(data.pw, 8);
+      assert.equal(data.return_body, true);
+      assert.equal(data.timeout, 10);
+      assert.equal(data.sloppy_quorum, true);
+      assert.equal(data.n_val, 12);
+      assert.equal(data.include_context, false);
+      done();
+    });
+    var buf = new schema.DtUpdateReq({
+      bucket: 'test bucket',
+      key: 'test key',
+      type: 'test type',
+      context: 'some context',
+      op: {
+        counter_op: {
+          increment: 1
+        },
+        set_op: {
+          adds: ['foo'],
+          removes: ['bar']
+        },
+        map_op: {
+          adds: [
+            {
+              name: 'counter1',
+              type: 1
+            }
+          ],
+          removes: [
+            {
+              name: 'set2',
+              type: 2
+            }
+          ],
+          updates: [
+            {
+              field: {
+                name: 'counter1',
+                type: 1
+              },
+              counter_op: {
+                increment: 1
+              }
+            },
+            {
+              field: {
+                name: 'set2',
+                type: 2
+              },
+              set_op: {
+                adds: ['foo'],
+                removes: ['bar']
+              }
+            },
+            {
+              field: {
+                name: 'register3',
+                type: 3
+              },
+              register_op: 'xyzzy'
+            },
+            {
+              field: {
+                name: 'flag4',
+                type: 4
+              },
+              flag_op: 2
+            },
+            {
+              field: {
+                name: 'map5',
+                type: 5
+              },
+              map_op: {
+                adds: [
+                  {
+                    name: 'flag44',
+                    type: 4
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      w: 6,
+      dw: 7,
+      pw: 8,
+      return_body: true,
+      timeout: 10,
+      sloppy_quorum: true,
+      n_val: 12,
+      include_context: false
+    }).toBuffer();
+    this.subject.write({
+      code: 82,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode DtUpdateResp', function (done) {
+    this.subject.on('data', function (data) {
+      assert.equal(data._type, 'DtUpdateResp');
+      assert.equal(data.key, 'test key');
+      assert(Buffer.isBuffer(data.context));
+      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.equal(data.counter_value, 199);
+      assert.equal(data.set_value.length, 3);
+      assert.equal(data.set_value[0], 'foo');
+      assert.equal(data.set_value[1], 'bar');
+      assert.equal(data.set_value[2], 'baz');
+      assert.equal(data.map_value.length, 1);
+      assert.equal(data.map_value[0].field.name, 'dory');
+      assert.equal(data.map_value[0].field.type, 'flag');
+      assert.equal(data.map_value[0].flag_value, true);
+      done();
+    });
+    var buf = new schema.DtUpdateResp({
+      key: 'test key',
+      context: 'some context',
+      counter_value: 199,
+      set_value: ['foo', 'bar', 'baz'],
+      map_value: [
+        {
+          field: {
+            name: 'dory',
+            type: 4
+          },
+          flag_value: true
+        }
+      ]
+    }).toBuffer();
+    this.subject.write({
+      code: 83,
+      size: buf.length,
+      data: buf
+    });
+  });
+
 // 253,RpbAuthReq,riak
 // 254,RpbAuthResp,riak
 // 255,RpbStartTls,riak
