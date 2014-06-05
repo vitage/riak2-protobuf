@@ -909,20 +909,20 @@ describe('Protocol Buffer Serializer', function () {
           adds: [
             {
               name: 'counter1',
-              type: 1
+              type: 'counter'
             }
           ],
           removes: [
             {
               name: 'set2',
-              type: 2
+              type: 'set'
             }
           ],
           updates: [
             {
               field: {
                 name: 'counter1',
-                type: 1
+                type: 'counter'
               },
               counter_op: {
                 increment: 1
@@ -931,7 +931,7 @@ describe('Protocol Buffer Serializer', function () {
             {
               field: {
                 name: 'set2',
-                type: 2
+                type: 'set'
               },
               set_op: {
                 adds: ['foo'],
@@ -941,27 +941,27 @@ describe('Protocol Buffer Serializer', function () {
             {
               field: {
                 name: 'register3',
-                type: 3
+                type: 'register'
               },
               register_op: 'xyzzy'
             },
             {
               field: {
                 name: 'flag4',
-                type: 4
+                type: 'flag'
               },
-              flag_op: 2
+              flag_op: 'disable'
             },
             {
               field: {
                 name: 'map5',
-                type: 5
+                type: 'map'
               },
               map_op: {
                 adds: [
                   {
                     name: 'flag44',
-                    type: 4
+                    type: 'flag'
                   }
                 ]
               }
@@ -1007,7 +1007,7 @@ describe('Protocol Buffer Serializer', function () {
         {
           field: {
             name: 'dory',
-            type: 4
+            type: 'flag'
           },
           flag_value: true
         }
