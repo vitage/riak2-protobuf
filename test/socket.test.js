@@ -14,10 +14,10 @@ describe('Protocol Buffer Socket', function () {
       ],
       asserts: [
         function (chunk) {
-          assert.equal(chunk.toString('base64'), 'AAAAAQ8=');
+          assert.strictEqual(chunk.toString('base64'), 'AAAAAQ8=');
         },
         function (chunk) {
-          assert.equal(chunk.toString('base64'), 'AAAAAQc=');
+          assert.strictEqual(chunk.toString('base64'), 'AAAAAQc=');
         }
       ]
     })
@@ -32,7 +32,7 @@ describe('Protocol Buffer Socket', function () {
 
   it('should use pipeline', function (done) {
     this.subject.once('data', function (data) {
-      assert.equal(data._type, 'RpbListBucketsResp');
+      assert.strictEqual(data._type, 'RpbListBucketsResp');
       assert.deepEqual(data, {
         buckets: ['test'],
         done: true
@@ -44,7 +44,7 @@ describe('Protocol Buffer Socket', function () {
 
   it('should use pipeline with no body', function (done) {
     this.subject.once('data', function (data) {
-      assert.equal(data._type, 'RpbGetServerInfoResp');
+      assert.strictEqual(data._type, 'RpbGetServerInfoResp');
       assert.deepEqual(data, {
         node: 'riak@127.0.0.1',
         server_version: '2.0.0beta1'

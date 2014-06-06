@@ -6,7 +6,7 @@ var schema = require('../lib/index').schema;
 function bodyless (code, type) {
   it('should decode ' + type, function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, type);
+      assert.strictEqual(data._type, type);
       done();
     });
     this.subject.write({
@@ -17,24 +17,24 @@ function bodyless (code, type) {
 
 function testContent (content) {
   assert.deepEqual(content.value, { hello: 'world' });
-  assert.equal(content.content_type, 'application/json');
-  assert.equal(content.charset, 'utf8');
-  assert.equal(content.content_encoding, '');
+  assert.strictEqual(content.content_type, 'application/json');
+  assert.strictEqual(content.charset, 'utf8');
+  assert.strictEqual(content.content_encoding, '');
   assert.deepEqual([].slice.call(content.vtag.toBuffer()), [17, 23]);
-  assert.equal(content.links.length, 1);
+  assert.strictEqual(content.links.length, 1);
   assert.deepEqual(content.links[0], {
     bucket: 'test bucket',
     key: 'linked key',
     tag: 'tagged'
   });
-  assert.equal(content.last_mod, 77777);
-  assert.equal(content.last_mod_usecs, 77777000);
-  assert.equal(content.usermeta.length, 1);
+  assert.strictEqual(content.last_mod, 77777);
+  assert.strictEqual(content.last_mod_usecs, 77777000);
+  assert.strictEqual(content.usermeta.length, 1);
   assert.deepEqual(content.usermeta[0], {
     key: 'testdata',
     value: 'foobar'
   });
-  assert.equal(content.indexes.length, 2);
+  assert.strictEqual(content.indexes.length, 2);
   assert.deepEqual(content.indexes, [
     {
       key: 'field1_bin',
@@ -45,7 +45,7 @@ function testContent (content) {
       value: '1004'
     }
   ]);
-  assert.equal(content.deleted, false);
+  assert.strictEqual(content.deleted, false);
 }
 
 testContent.data = {
@@ -83,27 +83,27 @@ testContent.data = {
 };
 
 function testBucketProps (props) {
-  assert.equal(props.n_val, 1);
-  assert.equal(props.allow_mult, false);
-  assert.equal(props.last_write_wins, false);
-  assert.equal(props.has_precommit, false);
-  assert.equal(props.has_postcommit, false);
-  assert.equal(props.old_vclock, 10);
-  assert.equal(props.young_vclock, 11);
-  assert.equal(props.big_vclock, 12);
-  assert.equal(props.small_vclock, 13);
-  assert.equal(props.pr, 14);
-  assert.equal(props.r, 15);
-  assert.equal(props.w, 16);
-  assert.equal(props.pw, 17);
-  assert.equal(props.dw, 18);
-  assert.equal(props.rw, 19);
-  assert.equal(props.basic_quorum, false);
-  assert.equal(props.notfound_ok, true);
-  assert.equal(props.backend, 'leveldb');
-  assert.equal(props.search, false);
-  assert.equal(props.repl, 'realtime');
-  assert.equal(props.search_index, 'default');
+  assert.strictEqual(props.n_val, 1);
+  assert.strictEqual(props.allow_mult, false);
+  assert.strictEqual(props.last_write_wins, false);
+  assert.strictEqual(props.has_precommit, false);
+  assert.strictEqual(props.has_postcommit, false);
+  assert.strictEqual(props.old_vclock, 10);
+  assert.strictEqual(props.young_vclock, 11);
+  assert.strictEqual(props.big_vclock, 12);
+  assert.strictEqual(props.small_vclock, 13);
+  assert.strictEqual(props.pr, 14);
+  assert.strictEqual(props.r, 15);
+  assert.strictEqual(props.w, 16);
+  assert.strictEqual(props.pw, 17);
+  assert.strictEqual(props.dw, 18);
+  assert.strictEqual(props.rw, 19);
+  assert.strictEqual(props.basic_quorum, false);
+  assert.strictEqual(props.notfound_ok, true);
+  assert.strictEqual(props.backend, 'leveldb');
+  assert.strictEqual(props.search, false);
+  assert.strictEqual(props.repl, 'realtime');
+  assert.strictEqual(props.search_index, 'default');
 }
 
 testBucketProps.data = {
@@ -152,9 +152,9 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbErrorResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbErrorResp');
-      assert.equal(data.errmsg, 'test message');
-      assert.equal(data.errcode, 255);
+      assert.strictEqual(data._type, 'RpbErrorResp');
+      assert.strictEqual(data.errmsg, 'test message');
+      assert.strictEqual(data.errcode, 255);
       done();
     });
     var buf = new schema.RpbErrorResp({
@@ -174,8 +174,8 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbGetClientIdResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbGetClientIdResp');
-      assert.equal(data.client_id, 'test client id');
+      assert.strictEqual(data._type, 'RpbGetClientIdResp');
+      assert.strictEqual(data.client_id, 'test client id');
       done();
     });
     var buf = new schema.RpbGetClientIdResp({
@@ -190,8 +190,8 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbSetClientIdReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbSetClientIdReq');
-      assert.equal(data.client_id, 'test client id');
+      assert.strictEqual(data._type, 'RpbSetClientIdReq');
+      assert.strictEqual(data.client_id, 'test client id');
       done();
     });
     var buf = new schema.RpbSetClientIdReq({
@@ -209,9 +209,9 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbGetServerInfoResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbGetServerInfoResp');
-      assert.equal(data.node, 'test node');
-      assert.equal(data.server_version, '2.0.0');
+      assert.strictEqual(data._type, 'RpbGetServerInfoResp');
+      assert.strictEqual(data.node, 'test node');
+      assert.strictEqual(data.server_version, '2.0.0');
       done();
     });
     var buf = new schema.RpbGetServerInfoResp({
@@ -227,18 +227,18 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbGetReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbGetReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.key, 'test key');
-      assert.equal(data.r, 3);
-      assert.equal(data.pr, 1);
-      assert.equal(data.basic_quorum, false);
+      assert.strictEqual(data._type, 'RpbGetReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.r, 3);
+      assert.strictEqual(data.pr, 1);
+      assert.strictEqual(data.basic_quorum, false);
       assert.deepEqual([].slice.call(data.if_modified.toBuffer()), [13, 19]);
-      assert.equal(data.head, false);
-      assert.equal(data.timeout, 12345);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 1);
-      assert.equal(data.type, 'default');
+      assert.strictEqual(data.head, false);
+      assert.strictEqual(data.timeout, 12345);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 1);
+      assert.strictEqual(data.type, 'default');
       done();
     });
     var buf = new schema.RpbGetReq({
@@ -265,10 +265,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbGetResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbGetResp');
+      assert.strictEqual(data._type, 'RpbGetResp');
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.unchanged, false);
-      assert.equal(data.content.length, 1);
+      assert.strictEqual(data.unchanged, false);
+      assert.strictEqual(data.content.length, 1);
       testContent(data.content[0]);
       done();
     });
@@ -290,7 +290,7 @@ describe('Protocol Buffer Parser', function () {
       content_type: 'text/plain'
     };
     this.subject.on('data', function (data) {
-      assert.equal(data.content[0].value, content.value);
+      assert.strictEqual(data.content[0].value, content.value);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -309,7 +309,7 @@ describe('Protocol Buffer Parser', function () {
       content_type: 'application/xml'
     };
     this.subject.on('data', function (data) {
-      assert.equal(data.content[0].value, content.value);
+      assert.strictEqual(data.content[0].value, content.value);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -328,7 +328,7 @@ describe('Protocol Buffer Parser', function () {
       content_type: 'application/html'
     };
     this.subject.on('data', function (data) {
-      assert.equal(data.content[0].value, content.value);
+      assert.strictEqual(data.content[0].value, content.value);
       done();
     });
     var buf = new schema.RpbGetResp({
@@ -363,22 +363,22 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbPutReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbPutReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.key, 'test key');
+      assert.strictEqual(data._type, 'RpbPutReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.w, 3);
-      assert.equal(data.dw, 2);
-      assert.equal(data.return_body, true);
-      assert.equal(data.pw, 1);
-      assert.equal(data.if_not_modified, true);
-      assert.equal(data.if_none_match, false);
-      assert.equal(data.return_head, false);
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.asis, false);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 3);
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data.w, 3);
+      assert.strictEqual(data.dw, 2);
+      assert.strictEqual(data.return_body, true);
+      assert.strictEqual(data.pw, 1);
+      assert.strictEqual(data.if_not_modified, true);
+      assert.strictEqual(data.if_none_match, false);
+      assert.strictEqual(data.return_head, false);
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.asis, false);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 3);
+      assert.strictEqual(data.type, 'test type');
       testContent(data.content);
       done();
     });
@@ -409,10 +409,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbPutResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbPutResp');
+      assert.strictEqual(data._type, 'RpbPutResp');
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.key, 'test key');
-      assert.equal(data.content.length, 1);
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.content.length, 1);
       testContent(data.content[0]);
       done();
     });
@@ -430,10 +430,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbPutResp with no content', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbPutResp');
+      assert.strictEqual(data._type, 'RpbPutResp');
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.key, 'test key');
-      assert.equal(data.content.length, 0);
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.content.length, 0);
       done();
     });
     var buf = new schema.RpbPutResp({
@@ -450,20 +450,20 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbDelReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbDelReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.key, 'test key');
-      assert.equal(data.rw, 3);
+      assert.strictEqual(data._type, 'RpbDelReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.rw, 3);
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.r, 2);
-      assert.equal(data.w, 1);
-      assert.equal(data.pr, 7);
-      assert.equal(data.pw, 8);
-      assert.equal(data.dw, 9);
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 3);
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data.r, 2);
+      assert.strictEqual(data.w, 1);
+      assert.strictEqual(data.pr, 7);
+      assert.strictEqual(data.pw, 8);
+      assert.strictEqual(data.dw, 9);
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 3);
+      assert.strictEqual(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbDelReq({
@@ -492,10 +492,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbListBucketsReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbListBucketsReq');
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.stream, false);
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data._type, 'RpbListBucketsReq');
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.stream, false);
+      assert.strictEqual(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbListBucketsReq({
@@ -512,9 +512,9 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbListBucketsResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbListBucketsResp');
+      assert.strictEqual(data._type, 'RpbListBucketsResp');
       assert.deepEqual(data.buckets, ['bucket1', 'bucket2', 'bucket3']);
-      assert.equal(data.done, true);
+      assert.strictEqual(data.done, true);
       done();
     });
     var buf = new schema.RpbListBucketsResp({
@@ -534,10 +534,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbListKeysReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbListKeysReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data._type, 'RpbListKeysReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbListKeysReq({
@@ -554,9 +554,9 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbListKeysResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbListKeysResp');
+      assert.strictEqual(data._type, 'RpbListKeysResp');
       assert.deepEqual(data.keys, ['key1', 'key1', 'key1']);
-      assert.equal(data.done, true);
+      assert.strictEqual(data.done, true);
       done();
     });
     var buf = new schema.RpbListKeysResp({
@@ -576,9 +576,9 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbGetBucketReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbGetBucketReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data._type, 'RpbGetBucketReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.type, 'test type');
       done();
     });
     var buf = new schema.RpbGetBucketReq({
@@ -594,7 +594,7 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbGetBucketResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbGetBucketResp');
+      assert.strictEqual(data._type, 'RpbGetBucketResp');
       testBucketProps(data.props);
       done();
     });
@@ -610,7 +610,7 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbSetBucketReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbSetBucketReq');
+      assert.strictEqual(data._type, 'RpbSetBucketReq');
       testBucketProps(data.props);
       done();
     });
@@ -649,9 +649,9 @@ describe('Protocol Buffer Parser', function () {
       return value;
     });
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbMapRedReq');
+      assert.strictEqual(data._type, 'RpbMapRedReq');
       assert.deepEqual(data.request, JSON.parse(request));
-      assert.equal(data.content_type, 'application/json');
+      assert.strictEqual(data.content_type, 'application/json');
       done();
     });
     var buf = new schema.RpbMapRedReq({
@@ -670,10 +670,10 @@ describe('Protocol Buffer Parser', function () {
       [['foo', 1],['baz', 0],['bar', 4],['bam', 3]]
     );
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbMapRedResp');
-      assert.equal(data.phase, 1);
+      assert.strictEqual(data._type, 'RpbMapRedResp');
+      assert.strictEqual(data.phase, 1);
       assert.deepEqual(data.response, response);
-      assert.equal(data.done, true);
+      assert.strictEqual(data.done, true);
       done();
     });
     var buf = new schema.RpbMapRedResp({
@@ -690,23 +690,23 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbIndexReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbIndexReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.index, 'test index');
-      assert.equal(data.qtype, 'range');
-      assert.equal(data.key, 'test key');
-      assert.equal(data.range_min, 'test min');
-      assert.equal(data.range_max, 'test max');
-      assert.equal(data.return_terms, false);
-      assert.equal(data.stream, true);
-      assert.equal(data.max_results, 10);
+      assert.strictEqual(data._type, 'RpbIndexReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.index, 'test index');
+      assert.strictEqual(data.qtype, 'range');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.range_min, 'test min');
+      assert.strictEqual(data.range_max, 'test max');
+      assert.strictEqual(data.return_terms, false);
+      assert.strictEqual(data.stream, true);
+      assert.strictEqual(data.max_results, 10);
       assert(Buffer.isBuffer(data.continuation));
-      assert.equal(data.continuation.toString('utf8'), 'test buffer');
-      assert.equal(data.timeout, 10000);
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data.continuation.toString('utf8'), 'test buffer');
+      assert.strictEqual(data.timeout, 10000);
+      assert.strictEqual(data.type, 'test type');
       assert(data.term_regex instanceof RegExp);
-      assert.equal(data.term_regex.source, '.*');
-      assert.equal(data.pagination_sort, false);
+      assert.strictEqual(data.term_regex.source, '.*');
+      assert.strictEqual(data.pagination_sort, false);
       done();
     });
     var buf = new schema.RpbIndexReq({
@@ -734,14 +734,14 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode RpbIndexResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'RpbIndexResp');
+      assert.strictEqual(data._type, 'RpbIndexResp');
       assert.deepEqual(data.keys, ['test key']);
-      assert.equal(data.results.length, 1);
-      assert.equal(data.results[0].key, 'test key');
-      assert.equal(data.results[0].value, 'test value');
+      assert.strictEqual(data.results.length, 1);
+      assert.strictEqual(data.results[0].key, 'test key');
+      assert.strictEqual(data.results[0].value, 'test value');
       assert(Buffer.isBuffer(data.continuation));
-      assert.equal(data.continuation.toString('utf8'), 'test buffer');
-      assert.equal(data.done, false);
+      assert.strictEqual(data.continuation.toString('utf8'), 'test buffer');
+      assert.strictEqual(data.done, false);
       done();
     });
     var buf = new schema.RpbIndexResp({
@@ -770,8 +770,10 @@ describe('Protocol Buffer Parser', function () {
 // 32,RpbSetBucketTypeReq,riak
 // 40,RpbCSBucketReq,riak_kv
 // 41,RpbCSBucketResp,riak_kv
+
 // 50,RpbCounterUpdateReq,riak_kv
 // 51,RpbCounterUpdateResp,riak_kv
+
 // 52,RpbCounterGetReq,riak_kv
 // 53,RpbCounterGetResp,riak_kv
 // 54,RpbYokozunaIndexGetReq,riak_yokozuna
@@ -784,18 +786,18 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode DtFetchReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'DtFetchReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.key, 'test key');
-      assert.equal(data.type, 'test type');
-      assert.equal(data.r, 1);
-      assert.equal(data.pr, 2);
-      assert.equal(data.basic_quorum, false);
-      assert.equal(data.notfound_ok, false);
-      assert.equal(data.timeout, 1000);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 4);
-      assert.equal(data.include_context, false);
+      assert.strictEqual(data._type, 'DtFetchReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.type, 'test type');
+      assert.strictEqual(data.r, 1);
+      assert.strictEqual(data.pr, 2);
+      assert.strictEqual(data.basic_quorum, false);
+      assert.strictEqual(data.notfound_ok, false);
+      assert.strictEqual(data.timeout, 1000);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 4);
+      assert.strictEqual(data.include_context, false);
       done();
     });
     var buf = new schema.DtFetchReq({
@@ -820,10 +822,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode DtFetchResp with counter', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'DtFetchResp');
+      assert.strictEqual(data._type, 'DtFetchResp');
       assert(Buffer.isBuffer(data.context));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.type, 'counter');
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.type, 'counter');
       assert.deepEqual(data.value, {
         counter_value: 199,
         set_value: [],
@@ -847,10 +849,10 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode DtFetchResp with set', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'DtFetchResp');
+      assert.strictEqual(data._type, 'DtFetchResp');
       assert(Buffer.isBuffer(data.context));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.type, 'set');
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.type, 'set');
       assert.deepEqual(data.value, {
         counter_value: null,
         set_value: ['foo', 'bar', 'baz'],
@@ -874,14 +876,14 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode DtFetchResp with map', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'DtFetchResp');
+      assert.strictEqual(data._type, 'DtFetchResp');
       assert(Buffer.isBuffer(data.context));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.type, 'map');
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.type, 'map');
       assert(data.value);
-      assert.equal(data.value.counter_value, null);
+      assert.strictEqual(data.value.counter_value, null);
       assert.deepEqual(data.value.set_value, []);
-      assert.equal(data.value.map_value.length, 5)
+      assert.strictEqual(data.value.map_value.length, 5)
       assert.deepEqual(data.value.map_value[0], {
         field: {
           name: 'counter1',
@@ -1011,54 +1013,54 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode DtUpdateReq', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'DtUpdateReq');
-      assert.equal(data.bucket, 'test bucket');
-      assert.equal(data.key, 'test key');
-      assert.equal(data.type, 'test type');
+      assert.strictEqual(data._type, 'DtUpdateReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.type, 'test type');
       assert(Buffer.isBuffer(data.context));
-      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
 
-      assert.equal(data.op.counter_op.increment, 1);
-      assert.equal(data.op.set_op.adds.length, 1);
-      assert.equal(data.op.set_op.adds[0], 'foo');
-      assert.equal(data.op.set_op.removes.length, 1);
-      assert.equal(data.op.set_op.removes[0], 'bar');
-      assert.equal(data.op.map_op.adds.length, 1);
-      assert.equal(data.op.map_op.adds[0].name, 'counter1');
-      assert.equal(data.op.map_op.adds[0].type, 'counter');
-      assert.equal(data.op.map_op.removes.length, 1);
-      assert.equal(data.op.map_op.removes[0].name, 'set2');
-      assert.equal(data.op.map_op.removes[0].type, 'set');
-      assert.equal(data.op.map_op.updates.length, 5);
-      assert.equal(data.op.map_op.updates[0].field.name, 'counter1');
-      assert.equal(data.op.map_op.updates[0].field.type, 'counter');
-      assert.equal(data.op.map_op.updates[0].counter_op.increment, 1);
-      assert.equal(data.op.map_op.updates[1].field.name, 'set2');
-      assert.equal(data.op.map_op.updates[1].field.type, 'set');
-      assert.equal(data.op.map_op.updates[1].set_op.adds.length, 1);
-      assert.equal(data.op.map_op.updates[1].set_op.adds[0], 'foo');
-      assert.equal(data.op.map_op.updates[1].set_op.removes.length, 1);
-      assert.equal(data.op.map_op.updates[1].set_op.removes[0], 'bar');
-      assert.equal(data.op.map_op.updates[2].field.name, 'register3');
-      assert.equal(data.op.map_op.updates[2].field.type, 'register');
-      assert.equal(data.op.map_op.updates[2].register_op, 'xyzzy');
-      assert.equal(data.op.map_op.updates[3].field.name, 'flag4');
-      assert.equal(data.op.map_op.updates[3].field.type, 'flag');
-      assert.equal(data.op.map_op.updates[3].flag_op, 'disable');
-      assert.equal(data.op.map_op.updates[4].field.name, 'map5');
-      assert.equal(data.op.map_op.updates[4].field.type, 'map');
-      assert.equal(data.op.map_op.updates[4].map_op.adds.length, 1);
-      assert.equal(data.op.map_op.updates[4].map_op.adds[0].name, 'flag44');
-      assert.equal(data.op.map_op.updates[4].map_op.adds[0].type, 'flag');
+      assert.strictEqual(data.op.counter_op.increment, 1);
+      assert.strictEqual(data.op.set_op.adds.length, 1);
+      assert.strictEqual(data.op.set_op.adds[0], 'foo');
+      assert.strictEqual(data.op.set_op.removes.length, 1);
+      assert.strictEqual(data.op.set_op.removes[0], 'bar');
+      assert.strictEqual(data.op.map_op.adds.length, 1);
+      assert.strictEqual(data.op.map_op.adds[0].name, 'counter1');
+      assert.strictEqual(data.op.map_op.adds[0].type, 'counter');
+      assert.strictEqual(data.op.map_op.removes.length, 1);
+      assert.strictEqual(data.op.map_op.removes[0].name, 'set2');
+      assert.strictEqual(data.op.map_op.removes[0].type, 'set');
+      assert.strictEqual(data.op.map_op.updates.length, 5);
+      assert.strictEqual(data.op.map_op.updates[0].field.name, 'counter1');
+      assert.strictEqual(data.op.map_op.updates[0].field.type, 'counter');
+      assert.strictEqual(data.op.map_op.updates[0].counter_op.increment, 1);
+      assert.strictEqual(data.op.map_op.updates[1].field.name, 'set2');
+      assert.strictEqual(data.op.map_op.updates[1].field.type, 'set');
+      assert.strictEqual(data.op.map_op.updates[1].set_op.adds.length, 1);
+      assert.strictEqual(data.op.map_op.updates[1].set_op.adds[0], 'foo');
+      assert.strictEqual(data.op.map_op.updates[1].set_op.removes.length, 1);
+      assert.strictEqual(data.op.map_op.updates[1].set_op.removes[0], 'bar');
+      assert.strictEqual(data.op.map_op.updates[2].field.name, 'register3');
+      assert.strictEqual(data.op.map_op.updates[2].field.type, 'register');
+      assert.strictEqual(data.op.map_op.updates[2].register_op, 'xyzzy');
+      assert.strictEqual(data.op.map_op.updates[3].field.name, 'flag4');
+      assert.strictEqual(data.op.map_op.updates[3].field.type, 'flag');
+      assert.strictEqual(data.op.map_op.updates[3].flag_op, 'disable');
+      assert.strictEqual(data.op.map_op.updates[4].field.name, 'map5');
+      assert.strictEqual(data.op.map_op.updates[4].field.type, 'map');
+      assert.strictEqual(data.op.map_op.updates[4].map_op.adds.length, 1);
+      assert.strictEqual(data.op.map_op.updates[4].map_op.adds[0].name, 'flag44');
+      assert.strictEqual(data.op.map_op.updates[4].map_op.adds[0].type, 'flag');
 
-      assert.equal(data.w, 6);
-      assert.equal(data.dw, 7);
-      assert.equal(data.pw, 8);
-      assert.equal(data.return_body, true);
-      assert.equal(data.timeout, 10);
-      assert.equal(data.sloppy_quorum, true);
-      assert.equal(data.n_val, 12);
-      assert.equal(data.include_context, false);
+      assert.strictEqual(data.w, 6);
+      assert.strictEqual(data.dw, 7);
+      assert.strictEqual(data.pw, 8);
+      assert.strictEqual(data.return_body, true);
+      assert.strictEqual(data.timeout, 10);
+      assert.strictEqual(data.sloppy_quorum, true);
+      assert.strictEqual(data.n_val, 12);
+      assert.strictEqual(data.include_context, false);
       done();
     });
     var buf = new schema.DtUpdateReq({
@@ -1156,19 +1158,19 @@ describe('Protocol Buffer Parser', function () {
 
   it('should decode DtUpdateResp', function (done) {
     this.subject.on('data', function (data) {
-      assert.equal(data._type, 'DtUpdateResp');
-      assert.equal(data.key, 'test key');
+      assert.strictEqual(data._type, 'DtUpdateResp');
+      assert.strictEqual(data.key, 'test key');
       assert(Buffer.isBuffer(data.context));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.counter_value, 199);
-      assert.equal(data.set_value.length, 3);
-      assert.equal(data.set_value[0], 'foo');
-      assert.equal(data.set_value[1], 'bar');
-      assert.equal(data.set_value[2], 'baz');
-      assert.equal(data.map_value.length, 1);
-      assert.equal(data.map_value[0].field.name, 'dory');
-      assert.equal(data.map_value[0].field.type, 'flag');
-      assert.equal(data.map_value[0].flag_value, true);
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.counter_value, 199);
+      assert.strictEqual(data.set_value.length, 3);
+      assert.strictEqual(data.set_value[0], 'foo');
+      assert.strictEqual(data.set_value[1], 'bar');
+      assert.strictEqual(data.set_value[2], 'baz');
+      assert.strictEqual(data.map_value.length, 1);
+      assert.strictEqual(data.map_value[0].field.name, 'dory');
+      assert.strictEqual(data.map_value[0].field.type, 'flag');
+      assert.strictEqual(data.map_value[0].flag_value, true);
       done();
     });
     var buf = new schema.DtUpdateResp({

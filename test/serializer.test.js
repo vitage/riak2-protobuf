@@ -8,11 +8,11 @@ function bodyless (code, type) {
     var subject = this.subject;
 
     subject.once('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), 1);
-      assert.equal(buf[4], code);
+      assert.strictEqual(buf.readUInt32BE(0), 1);
+      assert.strictEqual(buf[4], code);
       subject.on('data', function (buf) {
-        assert.equal(buf.readUInt32BE(0), 1);
-        assert.equal(buf[4], code);
+        assert.strictEqual(buf.readUInt32BE(0), 1);
+        assert.strictEqual(buf[4], code);
         done();
       });
     });
@@ -23,26 +23,26 @@ function bodyless (code, type) {
 }
 
 function testContent (content) {
-  assert.equal(content.value.toString('utf8'), '{"hello":"world"}');
-  assert.equal(content.content_type.toString('utf8'), 'application/json');
-  assert.equal(content.charset.toString('utf8'), 'utf8');
-  assert.equal(content.content_encoding.toString('utf8'), '');
+  assert.strictEqual(content.value.toString('utf8'), '{"hello":"world"}');
+  assert.strictEqual(content.content_type.toString('utf8'), 'application/json');
+  assert.strictEqual(content.charset.toString('utf8'), 'utf8');
+  assert.strictEqual(content.content_encoding.toString('utf8'), '');
   assert.deepEqual([].slice.call(content.vtag.toBuffer()), [17, 23]);
-  assert.equal(content.links.length, 1);
-  assert.equal(content.links[0].bucket.toString('utf8'), 'test bucket');
-  assert.equal(content.links[0].key.toString('utf8'), 'linked key');
-  assert.equal(content.links[0].tag.toString('utf8'), 'tagged');
-  assert.equal(content.last_mod, 77777);
-  assert.equal(content.last_mod_usecs, 77777000);
-  assert.equal(content.usermeta.length, 1);
-  assert.equal(content.usermeta[0].key.toString('utf8'), 'testdata');
-  assert.equal(content.usermeta[0].value.toString('utf8'), 'foobar');
-  assert.equal(content.indexes.length, 2);
-  assert.equal(content.indexes[0].key.toString('utf8'), 'field1_bin');
-  assert.equal(content.indexes[0].value.toString('utf8'), 'val4');
-  assert.equal(content.indexes[1].key.toString('utf8'), 'field1_int');
-  assert.equal(content.indexes[1].value.toString('utf8'), '1004');
-  assert.equal(content.deleted, false);
+  assert.strictEqual(content.links.length, 1);
+  assert.strictEqual(content.links[0].bucket.toString('utf8'), 'test bucket');
+  assert.strictEqual(content.links[0].key.toString('utf8'), 'linked key');
+  assert.strictEqual(content.links[0].tag.toString('utf8'), 'tagged');
+  assert.strictEqual(content.last_mod, 77777);
+  assert.strictEqual(content.last_mod_usecs, 77777000);
+  assert.strictEqual(content.usermeta.length, 1);
+  assert.strictEqual(content.usermeta[0].key.toString('utf8'), 'testdata');
+  assert.strictEqual(content.usermeta[0].value.toString('utf8'), 'foobar');
+  assert.strictEqual(content.indexes.length, 2);
+  assert.strictEqual(content.indexes[0].key.toString('utf8'), 'field1_bin');
+  assert.strictEqual(content.indexes[0].value.toString('utf8'), 'val4');
+  assert.strictEqual(content.indexes[1].key.toString('utf8'), 'field1_int');
+  assert.strictEqual(content.indexes[1].value.toString('utf8'), '1004');
+  assert.strictEqual(content.deleted, false);
 }
 
 testContent.data = {
@@ -80,27 +80,27 @@ testContent.data = {
 };
 
 function testBucketProps (props) {
-  assert.equal(props.n_val, 1);
-  assert.equal(props.allow_mult, false);
-  assert.equal(props.last_write_wins, false);
-  assert.equal(props.has_precommit, false);
-  assert.equal(props.has_postcommit, false);
-  assert.equal(props.old_vclock, 10);
-  assert.equal(props.young_vclock, 11);
-  assert.equal(props.big_vclock, 12);
-  assert.equal(props.small_vclock, 13);
-  assert.equal(props.pr, 14);
-  assert.equal(props.r, 15);
-  assert.equal(props.w, 16);
-  assert.equal(props.pw, 17);
-  assert.equal(props.dw, 18);
-  assert.equal(props.rw, 19);
-  assert.equal(props.basic_quorum, false);
-  assert.equal(props.notfound_ok, true);
-  assert.equal(props.backend.toString('utf8'), 'leveldb');
-  assert.equal(props.search, false);
-  assert.equal(props.repl, 1);
-  assert.equal(props.search_index.toString('utf8'), 'default');
+  assert.strictEqual(props.n_val, 1);
+  assert.strictEqual(props.allow_mult, false);
+  assert.strictEqual(props.last_write_wins, false);
+  assert.strictEqual(props.has_precommit, false);
+  assert.strictEqual(props.has_postcommit, false);
+  assert.strictEqual(props.old_vclock, 10);
+  assert.strictEqual(props.young_vclock, 11);
+  assert.strictEqual(props.big_vclock, 12);
+  assert.strictEqual(props.small_vclock, 13);
+  assert.strictEqual(props.pr, 14);
+  assert.strictEqual(props.r, 15);
+  assert.strictEqual(props.w, 16);
+  assert.strictEqual(props.pw, 17);
+  assert.strictEqual(props.dw, 18);
+  assert.strictEqual(props.rw, 19);
+  assert.strictEqual(props.basic_quorum, false);
+  assert.strictEqual(props.notfound_ok, true);
+  assert.strictEqual(props.backend.toString('utf8'), 'leveldb');
+  assert.strictEqual(props.search, false);
+  assert.strictEqual(props.repl, 1);
+  assert.strictEqual(props.search_index.toString('utf8'), 'default');
 }
 
 testBucketProps.data = {
@@ -149,11 +149,11 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbErrorResp with Error', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 0);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 0);
       var data = schema.RpbErrorResp.decode(buf.slice(5));
-      assert.equal(data.errmsg.toString('utf8'), 'test message');
-      assert.equal(data.errcode, 1234);
+      assert.strictEqual(data.errmsg.toString('utf8'), 'test message');
+      assert.strictEqual(data.errcode, 1234);
       done();
     });
     var err = new Error('test message');
@@ -163,11 +163,11 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbErrorResp with data', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 0);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 0);
       var data = schema.RpbErrorResp.decode(buf.slice(5));
-      assert.equal(data.errmsg.toString('utf8'), 'test message');
-      assert.equal(data.errcode, 1234);
+      assert.strictEqual(data.errmsg.toString('utf8'), 'test message');
+      assert.strictEqual(data.errcode, 1234);
       done();
     });
     this.subject.write({
@@ -182,10 +182,10 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbGetClientIdResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 4);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 4);
       var data = schema.RpbGetClientIdResp.decode(buf.slice(5));
-      assert.equal(data.client_id.toString('utf8'), 'test client id');
+      assert.strictEqual(data.client_id.toString('utf8'), 'test client id');
       done();
     });
     this.subject.write({
@@ -195,10 +195,10 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbSetClientIdReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 5);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 5);
       var data = schema.RpbSetClientIdReq.decode(buf.slice(5));
-      assert.equal(data.client_id.toString('utf8'), 'test client id');
+      assert.strictEqual(data.client_id.toString('utf8'), 'test client id');
       done();
     });
     this.subject.write({
@@ -211,11 +211,11 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbGetServerInfoResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 8);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 8);
       var data = schema.RpbGetServerInfoResp.decode(buf.slice(5));
-      assert.equal(data.node.toString('utf8'), 'test node');
-      assert.equal(data.server_version.toString('utf8'), '2.0.0');
+      assert.strictEqual(data.node.toString('utf8'), 'test node');
+      assert.strictEqual(data.server_version.toString('utf8'), '2.0.0');
       done();
     });
     this.subject.write({
@@ -226,20 +226,20 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbGetReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 9);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 9);
       var data = schema.RpbGetReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.r, 3);
-      assert.equal(data.pr, 1);
-      assert.equal(data.basic_quorum, false);
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.r, 3);
+      assert.strictEqual(data.pr, 1);
+      assert.strictEqual(data.basic_quorum, false);
       assert.deepEqual([].slice.call(data.if_modified.toBuffer()), [13, 19]);
-      assert.equal(data.head, false);
-      assert.equal(data.timeout, 12345);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 1);
-      assert.equal(data.type.toString('utf8'), 'default');
+      assert.strictEqual(data.head, false);
+      assert.strictEqual(data.timeout, 12345);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 1);
+      assert.strictEqual(data.type.toString('utf8'), 'default');
       done();
     });
     this.subject.write({
@@ -261,12 +261,12 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbGetResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 10);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 10);
       var data = schema.RpbGetResp.decode(buf.slice(5));
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.unchanged, false);
-      assert.equal(data.content.length, 1);
+      assert.strictEqual(data.unchanged, false);
+      assert.strictEqual(data.content.length, 1);
       testContent(data.content[0]);
       done();
     });
@@ -279,24 +279,24 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbPutReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 11);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 11);
       var data = schema.RpbPutReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.w, 3);
-      assert.equal(data.dw, 2);
-      assert.equal(data.return_body, true);
-      assert.equal(data.pw, 1);
-      assert.equal(data.if_not_modified, true);
-      assert.equal(data.if_none_match, false);
-      assert.equal(data.return_head, false);
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.asis, false);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 3);
-      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.w, 3);
+      assert.strictEqual(data.dw, 2);
+      assert.strictEqual(data.return_body, true);
+      assert.strictEqual(data.pw, 1);
+      assert.strictEqual(data.if_not_modified, true);
+      assert.strictEqual(data.if_none_match, false);
+      assert.strictEqual(data.return_head, false);
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.asis, false);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 3);
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
       testContent(data.content);
       done();
     });
@@ -322,12 +322,12 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbPutResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 12);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 12);
       var data = schema.RpbPutResp.decode(buf.slice(5));
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.content.length, 1);
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.content.length, 1);
       testContent(data.content[0]);
       done();
     });
@@ -340,22 +340,22 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbDelReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 13);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 13);
       var data = schema.RpbDelReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.rw, 3);
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.rw, 3);
       assert.deepEqual([].slice.call(data.vclock.toBuffer()), [13, 19]);
-      assert.equal(data.r, 2);
-      assert.equal(data.w, 1);
-      assert.equal(data.pr, 7);
-      assert.equal(data.pw, 8);
-      assert.equal(data.dw, 9);
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 3);
-      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.r, 2);
+      assert.strictEqual(data.w, 1);
+      assert.strictEqual(data.pr, 7);
+      assert.strictEqual(data.pw, 8);
+      assert.strictEqual(data.dw, 9);
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 3);
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
       done();
     });
     this.subject.write({
@@ -379,12 +379,12 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbListBucketsReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 15);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 15);
       var data = schema.RpbListBucketsReq.decode(buf.slice(5));
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.stream, false);
-      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.stream, false);
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
       done();
     });
     this.subject.write({
@@ -396,13 +396,13 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbListBucketsResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 16);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 16);
       var data = schema.RpbListBucketsResp.decode(buf.slice(5));
-      assert.equal(data.buckets[0].toString('utf8'), 'bucket1');
-      assert.equal(data.buckets[1].toString('utf8'), 'bucket2');
-      assert.equal(data.buckets[2].toString('utf8'), 'bucket3');
-      assert.equal(data.done, true);
+      assert.strictEqual(data.buckets[0].toString('utf8'), 'bucket1');
+      assert.strictEqual(data.buckets[1].toString('utf8'), 'bucket2');
+      assert.strictEqual(data.buckets[2].toString('utf8'), 'bucket3');
+      assert.strictEqual(data.done, true);
       done();
     });
     this.subject.write({
@@ -417,12 +417,12 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbListKeysReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 17);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 17);
       var data = schema.RpbListKeysReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.timeout, 77272);
-      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.timeout, 77272);
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
       done();
     });
     this.subject.write({
@@ -434,13 +434,13 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbListKeysResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 18);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 18);
       var data = schema.RpbListKeysResp.decode(buf.slice(5));
-      assert.equal(data.keys[0].toString('utf8'), 'key1');
-      assert.equal(data.keys[1].toString('utf8'), 'key2');
-      assert.equal(data.keys[2].toString('utf8'), 'key3');
-      assert.equal(data.done, true);
+      assert.strictEqual(data.keys[0].toString('utf8'), 'key1');
+      assert.strictEqual(data.keys[1].toString('utf8'), 'key2');
+      assert.strictEqual(data.keys[2].toString('utf8'), 'key3');
+      assert.strictEqual(data.done, true);
       done();
     });
     this.subject.write({
@@ -455,11 +455,11 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbGetBucketReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 19);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 19);
       var data = schema.RpbGetBucketReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
       done();
     });
     this.subject.write({
@@ -470,8 +470,8 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbGetBucketResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 20);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 20);
       var data = schema.RpbGetBucketResp.decode(buf.slice(5));
       testBucketProps(data.props);
       done();
@@ -483,8 +483,8 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbSetBucketReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 21);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 21);
       var data = schema.RpbSetBucketReq.decode(buf.slice(5));
       testBucketProps(data.props);
       done();
@@ -517,11 +517,11 @@ describe('Protocol Buffer Serializer', function () {
       return typeof value == 'function' ? value.toString() : value;
     });
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 23);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 23);
       var data = schema.RpbMapRedReq.decode(buf.slice(5));
       assert.deepEqual(data.request.toString('utf8'), reqstr);
-      assert.equal(data.content_type.toString('utf8'), 'application/json');
+      assert.strictEqual(data.content_type.toString('utf8'), 'application/json');
       done();
     });
     this.subject.write({
@@ -535,12 +535,12 @@ describe('Protocol Buffer Serializer', function () {
       [['foo', 1],['baz', 0],['bar', 4],['bam', 3]]
     );
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 24);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 24);
       var data = schema.RpbMapRedResp.decode(buf.slice(5));
-      assert.equal(data.phase, 1);
+      assert.strictEqual(data.phase, 1);
       assert.deepEqual(data.response.toString('utf8'), response);
-      assert.equal(data.done, true);
+      assert.strictEqual(data.done, true);
       done();
     });
     this.subject.write({
@@ -552,23 +552,23 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbIndexReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 25);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 25);
       var data = schema.RpbIndexReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.index.toString('utf8'), 'test index');
-      assert.equal(data.qtype, 1);
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.range_min.toString('utf8'), 'test min');
-      assert.equal(data.range_max.toString('utf8'), 'test max');
-      assert.equal(data.return_terms, false);
-      assert.equal(data.stream, true);
-      assert.equal(data.max_results, 10);
-      assert.equal(data.continuation.toString('utf8'), 'test buffer');
-      assert.equal(data.timeout, 10000);
-      assert.equal(data.type.toString('utf8'), 'test type');
-      assert.equal(data.term_regex.toString('utf8'), '.*');
-      assert.equal(data.pagination_sort, false);
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.index.toString('utf8'), 'test index');
+      assert.strictEqual(data.qtype, 1);
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.range_min.toString('utf8'), 'test min');
+      assert.strictEqual(data.range_max.toString('utf8'), 'test max');
+      assert.strictEqual(data.return_terms, false);
+      assert.strictEqual(data.stream, true);
+      assert.strictEqual(data.max_results, 10);
+      assert.strictEqual(data.continuation.toString('utf8'), 'test buffer');
+      assert.strictEqual(data.timeout, 10000);
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.term_regex.toString('utf8'), '.*');
+      assert.strictEqual(data.pagination_sort, false);
       done();
     });
     this.subject.write({
@@ -591,16 +591,16 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode RpbIndexResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 26);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 26);
       var data = schema.RpbIndexResp.decode(buf.slice(5));
-      assert.equal(data.keys.length, 1);
-      assert.equal(data.keys[0].toString('utf8'), 'test key');
-      assert.equal(data.results.length, 1);
-      assert.equal(data.results[0].key.toString('utf8'), 'test key');
-      assert.equal(data.results[0].value.toString('utf8'), 'test value');
-      assert.equal(data.continuation.toString('utf8'), 'test buffer');
-      assert.equal(data.done, false);
+      assert.strictEqual(data.keys.length, 1);
+      assert.strictEqual(data.keys[0].toString('utf8'), 'test key');
+      assert.strictEqual(data.results.length, 1);
+      assert.strictEqual(data.results[0].key.toString('utf8'), 'test key');
+      assert.strictEqual(data.results[0].value.toString('utf8'), 'test value');
+      assert.strictEqual(data.continuation.toString('utf8'), 'test buffer');
+      assert.strictEqual(data.done, false);
       done();
     });
     this.subject.write({
@@ -640,19 +640,19 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode DtFetchReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 80);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 80);
       var data = schema.DtFetchReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.type.toString('utf8'), 'test type');
-      assert.equal(data.r, 1);
-      assert.equal(data.pr, 2);
-      assert.equal(data.basic_quorum, false);
-      assert.equal(data.notfound_ok, false);
-      assert.equal(data.timeout, 1000);
-      assert.equal(data.sloppy_quorum, false);
-      assert.equal(data.n_val, 4);
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.r, 1);
+      assert.strictEqual(data.pr, 2);
+      assert.strictEqual(data.basic_quorum, false);
+      assert.strictEqual(data.notfound_ok, false);
+      assert.strictEqual(data.timeout, 1000);
+      assert.strictEqual(data.sloppy_quorum, false);
+      assert.strictEqual(data.n_val, 4);
       done();
     });
     this.subject.write({
@@ -671,11 +671,11 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode DtFetchResp with counter', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 81);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 81);
       var data = schema.DtFetchResp.decode(buf.slice(5));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.type, 1);
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.type, 1);
       assert.deepEqual(data.value, {
         counter_value: {
           low: 199,
@@ -698,17 +698,17 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode DtFetchResp with set', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 81);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 81);
       var data = schema.DtFetchResp.decode(buf.slice(5));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.type, 2);
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.type, 2);
       assert(data.value);
       assert.equal(data.value.counter_value, null);
-      assert.equal(data.value.set_value.length, 3);
-      assert.equal(data.value.set_value[0].toString('utf8'), 'foo');
-      assert.equal(data.value.set_value[1].toString('utf8'), 'bar');
-      assert.equal(data.value.set_value[2].toString('utf8'), 'baz');
+      assert.strictEqual(data.value.set_value.length, 3);
+      assert.strictEqual(data.value.set_value[0].toString('utf8'), 'foo');
+      assert.strictEqual(data.value.set_value[1].toString('utf8'), 'bar');
+      assert.strictEqual(data.value.set_value[2].toString('utf8'), 'baz');
       assert.deepEqual(data.value.map_value, []);
       done();
     });
@@ -723,66 +723,66 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode DtFetchResp with map', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 81);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 81);
       var data = schema.DtFetchResp.decode(buf.slice(5));
-      assert.equal(data.context.toString('utf8'), 'some context');
-      assert.equal(data.type, 3);
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.type, 3);
       assert(data.value);
       assert.equal(data.value.counter_value, null);
       assert.deepEqual(data.value.set_value, []);
-      assert.equal(data.value.map_value.length, 5)
+      assert.strictEqual(data.value.map_value.length, 5)
 
-      assert.equal(data.value.map_value[0].field.name.toString('utf8'), 'counter1');
-      assert.equal(data.value.map_value[0].field.type, 1);
+      assert.strictEqual(data.value.map_value[0].field.name.toString('utf8'), 'counter1');
+      assert.strictEqual(data.value.map_value[0].field.type, 1);
       assert.equal(data.value.map_value[0].counter_value, 881);
-      assert.equal(data.value.map_value[0].set_value.length, 0);
+      assert.strictEqual(data.value.map_value[0].set_value.length, 0);
       assert.equal(data.value.map_value[0].register_value, null);
       assert.equal(data.value.map_value[0].flag_value, null);
-      assert.equal(data.value.map_value[0].map_value.length, 0);
+      assert.strictEqual(data.value.map_value[0].map_value.length, 0);
 
-      assert.equal(data.value.map_value[1].field.name.toString('utf8'), 'set2');
-      assert.equal(data.value.map_value[1].field.type, 2);
+      assert.strictEqual(data.value.map_value[1].field.name.toString('utf8'), 'set2');
+      assert.strictEqual(data.value.map_value[1].field.type, 2);
       assert.equal(data.value.map_value[1].counter_value, null);
       assert.equal(data.value.map_value[1].set_value.length, 3);
-      assert.equal(data.value.map_value[1].set_value[0].toString('utf8'), 'foo');
-      assert.equal(data.value.map_value[1].set_value[1].toString('utf8'), 'bar');
-      assert.equal(data.value.map_value[1].set_value[2].toString('utf8'), 'baz');
+      assert.strictEqual(data.value.map_value[1].set_value[0].toString('utf8'), 'foo');
+      assert.strictEqual(data.value.map_value[1].set_value[1].toString('utf8'), 'bar');
+      assert.strictEqual(data.value.map_value[1].set_value[2].toString('utf8'), 'baz');
       assert.equal(data.value.map_value[1].register_value, null);
       assert.equal(data.value.map_value[1].flag_value, null);
-      assert.equal(data.value.map_value[1].map_value.length, 0);
+      assert.strictEqual(data.value.map_value[1].map_value.length, 0);
 
-      assert.equal(data.value.map_value[2].field.name.toString('utf8'), 'register3');
-      assert.equal(data.value.map_value[2].field.type, 3);
+      assert.strictEqual(data.value.map_value[2].field.name.toString('utf8'), 'register3');
+      assert.strictEqual(data.value.map_value[2].field.type, 3);
       assert.equal(data.value.map_value[2].counter_value, null);
-      assert.equal(data.value.map_value[2].set_value.length, 0);
-      assert.equal(data.value.map_value[2].register_value.toString('utf8'), 'xyzzy');
+      assert.strictEqual(data.value.map_value[2].set_value.length, 0);
+      assert.strictEqual(data.value.map_value[2].register_value.toString('utf8'), 'xyzzy');
       assert.equal(data.value.map_value[2].flag_value, null);
-      assert.equal(data.value.map_value[2].map_value.length, 0);
+      assert.strictEqual(data.value.map_value[2].map_value.length, 0);
 
-      assert.equal(data.value.map_value[3].field.name.toString('utf8'), 'flag4');
-      assert.equal(data.value.map_value[3].field.type, 4);
+      assert.strictEqual(data.value.map_value[3].field.name.toString('utf8'), 'flag4');
+      assert.strictEqual(data.value.map_value[3].field.type, 4);
       assert.equal(data.value.map_value[3].counter_value, null);
-      assert.equal(data.value.map_value[3].set_value.length, 0);
+      assert.strictEqual(data.value.map_value[3].set_value.length, 0);
       assert.equal(data.value.map_value[3].register_value, null);
-      assert.equal(data.value.map_value[3].flag_value, true);
-      assert.equal(data.value.map_value[3].map_value.length, 0);
+      assert.strictEqual(data.value.map_value[3].flag_value, true);
+      assert.strictEqual(data.value.map_value[3].map_value.length, 0);
 
-      assert.equal(data.value.map_value[4].field.name.toString('utf8'), 'map5');
-      assert.equal(data.value.map_value[4].field.type, 5);
+      assert.strictEqual(data.value.map_value[4].field.name.toString('utf8'), 'map5');
+      assert.strictEqual(data.value.map_value[4].field.type, 5);
       assert.equal(data.value.map_value[4].counter_value, null);
-      assert.equal(data.value.map_value[4].set_value.length, 0);
+      assert.strictEqual(data.value.map_value[4].set_value.length, 0);
       assert.equal(data.value.map_value[4].register_value, null);
       assert.equal(data.value.map_value[4].flag_value, null);
-      assert.equal(data.value.map_value[4].map_value.length, 1);
+      assert.strictEqual(data.value.map_value[4].map_value.length, 1);
 
-      assert.equal(data.value.map_value[4].map_value[0].field.name.toString('utf8'), 'counter1.1');
-      assert.equal(data.value.map_value[4].map_value[0].field.type, 1);
+      assert.strictEqual(data.value.map_value[4].map_value[0].field.name.toString('utf8'), 'counter1.1');
+      assert.strictEqual(data.value.map_value[4].map_value[0].field.type, 1);
       assert.equal(data.value.map_value[4].map_value[0].counter_value, 67);
-      assert.equal(data.value.map_value[4].map_value[0].set_value.length, 0);
+      assert.strictEqual(data.value.map_value[4].map_value[0].set_value.length, 0);
       assert.equal(data.value.map_value[4].map_value[0].register_value, null);
       assert.equal(data.value.map_value[4].map_value[0].flag_value, null);
-      assert.equal(data.value.map_value[4].map_value[0].map_value.length, 0);
+      assert.strictEqual(data.value.map_value[4].map_value[0].map_value.length, 0);
 
       done();
     });
@@ -841,55 +841,55 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode DtUpdateReq', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 82);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 82);
       var data = schema.DtUpdateReq.decode(buf.slice(5));
-      assert.equal(data.bucket.toString('utf8'), 'test bucket');
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.type.toString('utf8'), 'test type');
-      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.type.toString('utf8'), 'test type');
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
 
       assert.equal(data.op.counter_op.increment, 1);
-      assert.equal(data.op.set_op.adds.length, 1);
-      assert.equal(data.op.set_op.adds[0].toString('utf8'), 'foo');
-      assert.equal(data.op.set_op.removes.length, 1);
-      assert.equal(data.op.set_op.removes[0].toString('utf8'), 'bar');
-      assert.equal(data.op.map_op.adds.length, 1);
-      assert.equal(data.op.map_op.adds[0].name.toString('utf8'), 'counter1');
-      assert.equal(data.op.map_op.adds[0].type, 1);
-      assert.equal(data.op.map_op.removes.length, 1);
-      assert.equal(data.op.map_op.removes[0].name.toString('utf8'), 'set2');
-      assert.equal(data.op.map_op.removes[0].type, 2);
-      assert.equal(data.op.map_op.updates.length, 5);
-      assert.equal(data.op.map_op.updates[0].field.name.toString('utf8'), 'counter1');
-      assert.equal(data.op.map_op.updates[0].field.type, 1);
+      assert.strictEqual(data.op.set_op.adds.length, 1);
+      assert.strictEqual(data.op.set_op.adds[0].toString('utf8'), 'foo');
+      assert.strictEqual(data.op.set_op.removes.length, 1);
+      assert.strictEqual(data.op.set_op.removes[0].toString('utf8'), 'bar');
+      assert.strictEqual(data.op.map_op.adds.length, 1);
+      assert.strictEqual(data.op.map_op.adds[0].name.toString('utf8'), 'counter1');
+      assert.strictEqual(data.op.map_op.adds[0].type, 1);
+      assert.strictEqual(data.op.map_op.removes.length, 1);
+      assert.strictEqual(data.op.map_op.removes[0].name.toString('utf8'), 'set2');
+      assert.strictEqual(data.op.map_op.removes[0].type, 2);
+      assert.strictEqual(data.op.map_op.updates.length, 5);
+      assert.strictEqual(data.op.map_op.updates[0].field.name.toString('utf8'), 'counter1');
+      assert.strictEqual(data.op.map_op.updates[0].field.type, 1);
       assert.equal(data.op.map_op.updates[0].counter_op.increment, 1);
-      assert.equal(data.op.map_op.updates[1].field.name.toString('utf8'), 'set2');
-      assert.equal(data.op.map_op.updates[1].field.type, 2);
-      assert.equal(data.op.map_op.updates[1].set_op.adds.length, 1);
-      assert.equal(data.op.map_op.updates[1].set_op.adds[0].toString('utf8'), 'foo');
-      assert.equal(data.op.map_op.updates[1].set_op.removes.length, 1);
-      assert.equal(data.op.map_op.updates[1].set_op.removes[0].toString('utf8'), 'bar');
-      assert.equal(data.op.map_op.updates[2].field.name.toString('utf8'), 'register3');
-      assert.equal(data.op.map_op.updates[2].field.type, 3);
-      assert.equal(data.op.map_op.updates[2].register_op.toString('utf8'), 'xyzzy');
-      assert.equal(data.op.map_op.updates[3].field.name.toString('utf8'), 'flag4');
-      assert.equal(data.op.map_op.updates[3].field.type, 4);
-      assert.equal(data.op.map_op.updates[3].flag_op, 2);
-      assert.equal(data.op.map_op.updates[4].field.name.toString('utf8'), 'map5');
-      assert.equal(data.op.map_op.updates[4].field.type, 5);
-      assert.equal(data.op.map_op.updates[4].map_op.adds.length, 1);
-      assert.equal(data.op.map_op.updates[4].map_op.adds[0].name.toString('utf8'), 'flag44');
-      assert.equal(data.op.map_op.updates[4].map_op.adds[0].type, 4);
+      assert.strictEqual(data.op.map_op.updates[1].field.name.toString('utf8'), 'set2');
+      assert.strictEqual(data.op.map_op.updates[1].field.type, 2);
+      assert.strictEqual(data.op.map_op.updates[1].set_op.adds.length, 1);
+      assert.strictEqual(data.op.map_op.updates[1].set_op.adds[0].toString('utf8'), 'foo');
+      assert.strictEqual(data.op.map_op.updates[1].set_op.removes.length, 1);
+      assert.strictEqual(data.op.map_op.updates[1].set_op.removes[0].toString('utf8'), 'bar');
+      assert.strictEqual(data.op.map_op.updates[2].field.name.toString('utf8'), 'register3');
+      assert.strictEqual(data.op.map_op.updates[2].field.type, 3);
+      assert.strictEqual(data.op.map_op.updates[2].register_op.toString('utf8'), 'xyzzy');
+      assert.strictEqual(data.op.map_op.updates[3].field.name.toString('utf8'), 'flag4');
+      assert.strictEqual(data.op.map_op.updates[3].field.type, 4);
+      assert.strictEqual(data.op.map_op.updates[3].flag_op, 2);
+      assert.strictEqual(data.op.map_op.updates[4].field.name.toString('utf8'), 'map5');
+      assert.strictEqual(data.op.map_op.updates[4].field.type, 5);
+      assert.strictEqual(data.op.map_op.updates[4].map_op.adds.length, 1);
+      assert.strictEqual(data.op.map_op.updates[4].map_op.adds[0].name.toString('utf8'), 'flag44');
+      assert.strictEqual(data.op.map_op.updates[4].map_op.adds[0].type, 4);
 
-      assert.equal(data.w, 6);
-      assert.equal(data.dw, 7);
-      assert.equal(data.pw, 8);
-      assert.equal(data.return_body, true);
-      assert.equal(data.timeout, 10);
-      assert.equal(data.sloppy_quorum, true);
-      assert.equal(data.n_val, 12);
-      assert.equal(data.include_context, false);
+      assert.strictEqual(data.w, 6);
+      assert.strictEqual(data.dw, 7);
+      assert.strictEqual(data.pw, 8);
+      assert.strictEqual(data.return_body, true);
+      assert.strictEqual(data.timeout, 10);
+      assert.strictEqual(data.sloppy_quorum, true);
+      assert.strictEqual(data.n_val, 12);
+      assert.strictEqual(data.include_context, false);
       done();
     });
     this.subject.write({
@@ -982,20 +982,20 @@ describe('Protocol Buffer Serializer', function () {
 
   it('should encode DtUpdateResp', function (done) {
     this.subject.on('data', function (buf) {
-      assert.equal(buf.readUInt32BE(0), buf.length - 4);
-      assert.equal(buf[4], 83);
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 83);
       var data = schema.DtUpdateResp.decode(buf.slice(5));
-      assert.equal(data.key.toString('utf8'), 'test key');
-      assert.equal(data.context.toString('utf8'), 'some context');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.context.toString('utf8'), 'some context');
       assert.equal(data.counter_value, 199);
-      assert.equal(data.set_value.length, 3);
-      assert.equal(data.set_value[0].toString('utf8'), 'foo');
-      assert.equal(data.set_value[1].toString('utf8'), 'bar');
-      assert.equal(data.set_value[2].toString('utf8'), 'baz');
-      assert.equal(data.map_value.length, 1);
-      assert.equal(data.map_value[0].field.name.toString('utf8'), 'dory');
-      assert.equal(data.map_value[0].field.type, 4);
-      assert.equal(data.map_value[0].flag_value, true);
+      assert.strictEqual(data.set_value.length, 3);
+      assert.strictEqual(data.set_value[0].toString('utf8'), 'foo');
+      assert.strictEqual(data.set_value[1].toString('utf8'), 'bar');
+      assert.strictEqual(data.set_value[2].toString('utf8'), 'baz');
+      assert.strictEqual(data.map_value.length, 1);
+      assert.strictEqual(data.map_value[0].field.name.toString('utf8'), 'dory');
+      assert.strictEqual(data.map_value[0].field.type, 4);
+      assert.strictEqual(data.map_value[0].flag_value, true);
       done();
     });
     this.subject.write({

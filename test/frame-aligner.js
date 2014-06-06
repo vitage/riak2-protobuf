@@ -10,10 +10,10 @@ describe('Protocol Buffer FrameAligner', function () {
 
   it('should chunk one message', function (done) {
     this.subject.on('data', function (message) {
-      assert.equal(message.code, 16);
-      assert.equal(message.size, 1);
-      assert.equal(message.data.length, 1);
-      assert.equal(message.data[0], 13);
+      assert.strictEqual(message.code, 16);
+      assert.strictEqual(message.size, 1);
+      assert.strictEqual(message.data.length, 1);
+      assert.strictEqual(message.data[0], 13);
       done();
     });
     this.subject.write(new Buffer([0, 0, 0, 2, 16, 13, 17]))
@@ -26,9 +26,9 @@ describe('Protocol Buffer FrameAligner', function () {
     ];
     this.subject.on('data', function (message) {
       var expect = expects.shift();
-      assert.equal(message.code, expect.code);
-      assert.equal(message.size, expect.size);
-      assert.equal(message.data.length, expect.size);
+      assert.strictEqual(message.code, expect.code);
+      assert.strictEqual(message.size, expect.size);
+      assert.strictEqual(message.data.length, expect.size);
       assert.deepEqual([].slice.call(message.data), expect.data);
       done();
     });
