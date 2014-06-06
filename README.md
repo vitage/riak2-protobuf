@@ -69,8 +69,6 @@ return data from Riak as-is:
 32,RpbSetBucketTypeReq,riak
 40,RpbCSBucketReq,riak_kv
 41,RpbCSBucketResp,riak_kv
-50,RpbCounterUpdateReq,riak_kv
-51,RpbCounterUpdateResp,riak_kv
 52,RpbCounterGetReq,riak_kv
 53,RpbCounterGetResp,riak_kv
 54,RpbYokozunaIndexGetReq,riak_yokozuna

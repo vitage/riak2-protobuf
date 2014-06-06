@@ -771,6 +771,50 @@ describe('Protocol Buffer Parser', function () {
 // 40,RpbCSBucketReq,riak_kv
 // 41,RpbCSBucketResp,riak_kv
 
+  it('should decode RpbCounterUpdateReq', function (done) {
+    this.subject.on('data', function (data) {
+      assert.strictEqual(data._type, 'RpbCounterUpdateReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.amount, 187);
+      assert.strictEqual(data.w, 4);
+      assert.strictEqual(data.dw, 5);
+      assert.strictEqual(data.pw, 6);
+      assert.strictEqual(data.returnvalue, true);
+      done();
+    });
+    var buf = new schema.RpbCounterUpdateReq({
+      bucket: 'test bucket',
+      key: 'test key',
+      amount: 187,
+      w: 4,
+      dw: 5,
+      pw: 6,
+      returnvalue: true
+    }).toBuffer();
+    this.subject.write({
+      code: 50,
+      size: buf.length,
+      data: buf
+    });
+  });
+
+  it('should decode RpbCounterUpdateResp', function (done) {
+    this.subject.on('data', function (data) {
+      assert.strictEqual(data._type, 'RpbCounterUpdateResp');
+      assert.strictEqual(data.value, 187);
+      done();
+    });
+    var buf = new schema.RpbCounterUpdateResp({
+      value: 187
+    }).toBuffer();
+    this.subject.write({
+      code: 51,
+      size: buf.length,
+      data: buf
+    });
+  });
+
 // 50,RpbCounterUpdateReq,riak_kv
 // 51,RpbCounterUpdateResp,riak_kv
 

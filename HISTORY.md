@@ -3,6 +3,7 @@
 
   * Implement `DtFetchReq` and `DtFetchResp`
   * Implement `DtUpdateReq` and `DtUpdateResp`
+  * Implement `RpbCounterUpdateReq` and `RpbCounterUpdateResp`
 
 
 0.1.0 / 2014-06-02

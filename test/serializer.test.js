@@ -626,8 +626,45 @@ describe('Protocol Buffer Serializer', function () {
 // 32,RpbSetBucketTypeReq,riak
 // 40,RpbCSBucketReq,riak_kv
 // 41,RpbCSBucketResp,riak_kv
-// 50,RpbCounterUpdateReq,riak_kv
-// 51,RpbCounterUpdateResp,riak_kv
+
+  it('should decode RpbCounterUpdateReq', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 50);
+      var data = schema.RpbCounterUpdateReq.decode(buf.slice(5));
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.equal(data.amount, 187);
+      assert.strictEqual(data.w, 4);
+      assert.strictEqual(data.dw, 5);
+      assert.strictEqual(data.pw, 6);
+      assert.strictEqual(data.returnvalue, true);
+      done();
+    });
+    this.subject.write({
+      bucket: 'test bucket',
+      key: 'test key',
+      amount: 187,
+      w: 4,
+      dw: 5,
+      pw: 6,
+      returnvalue: true
+    }, 'RpbCounterUpdateReq');
+  });
+
+  it('should decode RpbCounterUpdateResp', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 51);
+      var data = schema.RpbCounterUpdateResp.decode(buf.slice(5));
+      assert.equal(data.value, 187);
+      done();
+    });
+    this.subject.write({
+      value: 187
+    }, 'RpbCounterUpdateResp');
+  });
+
 // 52,RpbCounterGetReq,riak_kv
 // 53,RpbCounterGetResp,riak_kv
 // 54,RpbYokozunaIndexGetReq,riak_yokozuna
