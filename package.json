@@ -1,6 +1,6 @@
 {
   "name": "riak2-protobuf",
-  "version": "0.1.1-dev",
+  "version": "0.2.0",
   "description": "Riak Protocol Buffer stream for Node.JS",
   "main": "lib/index.js",
   "repository": "https://github.com/mikepb/riak2-protobuf.git",

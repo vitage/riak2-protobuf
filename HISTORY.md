@@ -1,10 +1,11 @@
-0.1.1-dev / 2014-00-00
+0.2.0 / 2014-06-06
 ======================
 
   * Implement `DtFetchReq` and `DtFetchResp`
   * Implement `DtUpdateReq` and `DtUpdateResp`
   * Implement `RpbCounterGetReq` and `RpbCounterGetResp`
   * Implement `RpbCounterUpdateReq` and `RpbCounterUpdateResp`
+  * Rename `FrameAligner` to `Framer`
 
 
 0.1.0 / 2014-06-02
