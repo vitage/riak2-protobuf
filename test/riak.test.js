@@ -1,7 +1,6 @@
 var assert = require('assert');
 
 var riakpb = require('../lib/index');
-var Socket = riakpb.Socket;
 var MockSocket = require('./mock/socket');
 
 describe('Protocol Buffer Socket', function () {
@@ -21,13 +20,9 @@ describe('Protocol Buffer Socket', function () {
         }
       ]
     })
-    this.subject = new Socket({
+    this.subject = riakpb({
       socket: this.socket
     });
-  });
-
-  it('should === exports', function () {
-    assert.strictEqual(Socket, riakpb);
   });
 
   it('should use pipeline', function (done) {
@@ -56,11 +51,6 @@ describe('Protocol Buffer Socket', function () {
 
   it('should end', function () {
     this.subject.end();
-  });
-
-  it('should destroy', function () {
-    this.subject.destroy();
-    assert(this.subject.destroyed);
   });
 
 });

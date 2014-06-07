@@ -10,6 +10,7 @@
   "author": "Michael Phan-Ba <michael@mikepb.com>",
   "license": "MIT",
   "dependencies": {
+    "duplexer": "^0.1.1",
     "lodash": "^2.4.1",
     "node-int64": "^0.3.1",
     "protobufjs": "^2.0.5"
