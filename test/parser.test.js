@@ -20,7 +20,8 @@ function testContent (content) {
   assert.strictEqual(content.content_type, 'application/json');
   assert.strictEqual(content.charset, 'utf8');
   assert.strictEqual(content.content_encoding, '');
-  assert.deepEqual([].slice.call(content.vtag.toBuffer()), [17, 23]);
+  assert(Buffer.isBuffer(content.vtag));
+  assert.deepEqual([].slice.call(content.vtag), [17, 23]);
   assert.strictEqual(content.links.length, 1);
   assert.deepEqual(content.links[0], {
     bucket: 'test bucket',
