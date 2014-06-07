@@ -815,11 +815,48 @@ describe('Protocol Buffer Parser', function () {
     });
   });
 
-// 50,RpbCounterUpdateReq,riak_kv
-// 51,RpbCounterUpdateResp,riak_kv
+  it('should decode RpbCounterGetReq', function (done) {
+    this.subject.on('data', function (data) {
+      assert.strictEqual(data._type, 'RpbCounterGetReq');
+      assert.strictEqual(data.bucket, 'test bucket');
+      assert.strictEqual(data.key, 'test key');
+      assert.strictEqual(data.r, 3);
+      assert.strictEqual(data.pr, 4);
+      assert.strictEqual(data.basic_quorum, true);
+      assert.strictEqual(data.notfound_ok, true);
+      done();
+    });
+    var buf = new schema.RpbCounterGetReq({
+      bucket: 'test bucket',
+      key: 'test key',
+      r: 3,
+      pr: 4,
+      basic_quorum: true,
+      notfound_ok: true
+    }).toBuffer();
+    this.subject.write({
+      code: 52,
+      size: buf.length,
+      data: buf
+    });
+  });
 
-// 52,RpbCounterGetReq,riak_kv
-// 53,RpbCounterGetResp,riak_kv
+  it('should decode RpbCounterGetResp', function (done) {
+    this.subject.on('data', function (data) {
+      assert.strictEqual(data._type, 'RpbCounterGetResp');
+      assert.strictEqual(data.value, 187);
+      done();
+    });
+    var buf = new schema.RpbCounterGetResp({
+      value: 187
+    }).toBuffer();
+    this.subject.write({
+      code: 53,
+      size: buf.length,
+      data: buf
+    });
+  });
+
 // 54,RpbYokozunaIndexGetReq,riak_yokozuna
 // 55,RpbYokozunaIndexGetResp,riak_yokozuna
 // 56,RpbYokozunaIndexPutReq,riak_yokozuna

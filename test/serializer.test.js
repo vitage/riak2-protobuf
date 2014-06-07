@@ -665,8 +665,42 @@ describe('Protocol Buffer Serializer', function () {
     }, 'RpbCounterUpdateResp');
   });
 
-// 52,RpbCounterGetReq,riak_kv
-// 53,RpbCounterGetResp,riak_kv
+  it('should decode RpbCounterGetReq', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 52);
+      var data = schema.RpbCounterGetReq.decode(buf.slice(5));
+      assert.strictEqual(data.bucket.toString('utf8'), 'test bucket');
+      assert.strictEqual(data.key.toString('utf8'), 'test key');
+      assert.strictEqual(data.r, 3);
+      assert.strictEqual(data.pr, 4);
+      assert.strictEqual(data.basic_quorum, true);
+      assert.strictEqual(data.notfound_ok, true);
+      done();
+    });
+    this.subject.write({
+      bucket: 'test bucket',
+      key: 'test key',
+      r: 3,
+      pr: 4,
+      basic_quorum: true,
+      notfound_ok: true
+    }, 'RpbCounterGetReq');
+  });
+
+  it('should decode RpbCounterGetResp', function (done) {
+    this.subject.on('data', function (buf) {
+      assert.strictEqual(buf.readUInt32BE(0), buf.length - 4);
+      assert.strictEqual(buf[4], 53);
+      var data = schema.RpbCounterGetResp.decode(buf.slice(5));
+      assert.equal(data.value, 187);
+      done();
+    });
+    this.subject.write({
+      value: 187
+    }, 'RpbCounterGetResp');
+  });
+
 // 54,RpbYokozunaIndexGetReq,riak_yokozuna
 // 55,RpbYokozunaIndexGetResp,riak_yokozuna
 // 56,RpbYokozunaIndexPutReq,riak_yokozuna
