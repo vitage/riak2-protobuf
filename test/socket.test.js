@@ -1,6 +1,6 @@
 var assert = require('assert');
 
-var riakpb = require('../lib/index');
+var Socket = require('../lib/index').Socket;
 var MockSocket = require('./mock/socket');
 
 describe('Protocol Buffer Socket', function () {
@@ -20,7 +20,7 @@ describe('Protocol Buffer Socket', function () {
         }
       ]
     })
-    this.subject = riakpb({
+    this.subject = new Socket({
       socket: this.socket
     });
   });
@@ -51,6 +51,11 @@ describe('Protocol Buffer Socket', function () {
 
   it('should end', function () {
     this.subject.end();
+  });
+
+  it('should destroy', function () {
+    this.subject.destroy();
+    assert(this.subject.destroyed);
   });
 
 });
